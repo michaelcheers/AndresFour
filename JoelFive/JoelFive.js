@@ -1,0 +1,556 @@
+/**
+ * @version 1.0.0.0
+ * @copyright Copyright ©  2017
+ * @compiler Bridge.NET 16.0.0-beta
+ */
+Bridge.assembly("JoelFive", function ($asm, globals) {
+    "use strict";
+
+    Bridge.define("JoelFive.App", {
+        main: function Main() {
+            var $step = 0,
+                $task1, 
+                $taskResult1, 
+                $jumpFromFinally, 
+                game, 
+                $asyncBody = Bridge.fn.bind(this, function () {
+                    for (;;) {
+                        $step = System.Array.min([0,1], $step);
+                        switch ($step) {
+                            case 0: {
+                                $task1 = JoelFive.Game.Parse({ width: 500, height: 500, interval: 25, drawInterval: 25, children: System.Array.init([{ type: "real game object", x: 50, y: 50, width: 50, height: 50, image: "#ffc0c0", gravity: 1 }, { type: "real game object", x: 50, y: 200, width: 50, height: 50, image: "#c0ffc0", gravity: 0 }], System.Object) });
+                                $step = 1;
+                                $task1.continueWith($asyncBody, true);
+                                return;
+                            }
+                            case 1: {
+                                $taskResult1 = $task1.getAwaitedResult();
+                                game = $taskResult1;
+                                document.body.appendChild(game.Canvas);
+                                game.Start();
+                                return;
+                            }
+                            default: {
+                                return;
+                            }
+                        }
+                    }
+                }, arguments);
+
+            $asyncBody();
+        },
+        statics: {
+            fields: {
+                smallNumber: 0
+            },
+            ctors: {
+                init: function () {
+                    this.smallNumber = 0.0001;
+                }
+            },
+            methods: {
+                LoadImage: function (value) {
+                    var $t;
+                    var image = ($t=new Image(), $t.src = value, $t);
+                    var task = new System.Threading.Tasks.TaskCompletionSource();
+                    image.onload = function (e) {
+                        task.setResult(image);
+                    };
+                    return task.task;
+                }
+            }
+        }
+    });
+
+    Bridge.define("JoelFive.GameObject", {
+        statics: {
+            methods: {
+                Parse: function (dynamic) {
+                    var $step = 0,
+                        $task1, 
+                        $task2, 
+                        $jumpFromFinally, 
+                        $tcs = new System.Threading.Tasks.TaskCompletionSource(), 
+                        $returnValue, 
+                        result, 
+                        type, 
+                        realGameObject, 
+                        drawnGameObject, 
+                        $async_e, 
+                        $asyncBody = Bridge.fn.bind(this, function () {
+                            try {
+                                for (;;) {
+                                    $step = System.Array.min([0,1,2,3,4,5], $step);
+                                    switch ($step) {
+                                        case 0: {
+                                            result = null;
+                                            type = dynamic.type;
+                                            if (type === "real game object") {
+                                                $step = 1;
+                                                continue;
+                                            }
+                                            else if (type === "drawn game object") {
+                                                $step = 3;
+                                                continue;
+                                            }
+                                            $step = 5;
+                                            continue;
+                                        }
+                                        case 1: {
+                                            realGameObject = new JoelFive.RealGameObject();
+                                            $task1 = realGameObject.Parse2(dynamic);
+                                            $step = 2;
+                                            $task1.continueWith($asyncBody);
+                                            return;
+                                        }
+                                        case 2: {
+                                            $task1.getAwaitedResult();
+                                            result = realGameObject;
+                                            $step = 5;
+                                            continue;
+                                        }
+                                        case 3: {
+                                            drawnGameObject = new JoelFive.DrawnGameObject();
+                                            $task2 = drawnGameObject.Parse1(dynamic);
+                                            $step = 4;
+                                            $task2.continueWith($asyncBody);
+                                            return;
+                                        }
+                                        case 4: {
+                                            $task2.getAwaitedResult();
+                                            result = drawnGameObject;
+                                            $step = 5;
+                                            continue;
+                                        }
+                                        case 5: {
+                                            $tcs.setResult(result);
+                                            return;
+                                        }
+                                        default: {
+                                            $tcs.setResult(null);
+                                            return;
+                                        }
+                                    }
+                                }
+                            } catch($async_e1) {
+                                $async_e = System.Exception.create($async_e1);
+                                $tcs.setException($async_e);
+                            }
+                        }, arguments);
+
+                    $asyncBody();
+                    return $tcs.task;
+                }
+            }
+        }
+    });
+
+    Bridge.define("JoelFive.Rectangle", {
+        $kind: "struct",
+        statics: {
+            methods: {
+                getDefaultValue: function () { return new JoelFive.Rectangle(); }
+            }
+        },
+        fields: {
+            X: 0,
+            Y: 0,
+            Width: 0,
+            Height: 0
+        },
+        ctors: {
+            ctor: function () {
+                this.$initialize();
+            }
+        },
+        methods: {
+            /**
+             * Gets whether or not the other {@link } intersects with this rectangle.
+             *
+             * @instance
+             * @public
+             * @this JoelFive.Rectangle
+             * @memberof JoelFive.Rectangle
+             * @param   {JoelFive.Rectangle}    value    The other rectangle for testing.
+             * @return  {boolean}                        <pre><code>true</code></pre> if other {@link } intersects with this rectangle; <pre><code>false</code></pre> otherwise.
+             */
+            Intersects: function (value) {
+                return value.X < this.X + this.Width && this.X < value.X + value.Width && value.Y < this.Y + this.Height && this.Y < value.Y + value.Height;
+            },
+            getHashCode: function () {
+                var h = Bridge.addHash([3771388952, this.X, this.Y, this.Width, this.Height]);
+                return h;
+            },
+            equals: function (o) {
+                if (!Bridge.is(o, JoelFive.Rectangle)) {
+                    return false;
+                }
+                return Bridge.equals(this.X, o.X) && Bridge.equals(this.Y, o.Y) && Bridge.equals(this.Width, o.Width) && Bridge.equals(this.Height, o.Height);
+            },
+            $clone: function (to) {
+                var s = to || new JoelFive.Rectangle();
+                s.X = this.X;
+                s.Y = this.Y;
+                s.Width = this.Width;
+                s.Height = this.Height;
+                return s;
+            }
+        }
+    });
+
+    Bridge.define("JoelFive.Vector2", {
+        $kind: "struct",
+        statics: {
+            methods: {
+                getDefaultValue: function () { return new JoelFive.Vector2(); }
+            }
+        },
+        fields: {
+            X: 0,
+            Y: 0
+        },
+        ctors: {
+            ctor: function () {
+                this.$initialize();
+            }
+        },
+        methods: {
+            getHashCode: function () {
+                var h = Bridge.addHash([1955977157, this.X, this.Y]);
+                return h;
+            },
+            equals: function (o) {
+                if (!Bridge.is(o, JoelFive.Vector2)) {
+                    return false;
+                }
+                return Bridge.equals(this.X, o.X) && Bridge.equals(this.Y, o.Y);
+            },
+            $clone: function (to) {
+                var s = to || new JoelFive.Vector2();
+                s.X = this.X;
+                s.Y = this.Y;
+                return s;
+            }
+        }
+    });
+
+    Bridge.define("JoelFive.DrawnGameObject", {
+        inherits: [JoelFive.GameObject],
+        fields: {
+            Position: null,
+            Image: null
+        },
+        props: {
+            X: {
+                get: function () {
+                    return this.Position.X;
+                },
+                set: function (value) {
+                    this.Position.X = value;
+                }
+            },
+            Y: {
+                get: function () {
+                    return this.Position.Y;
+                },
+                set: function (value) {
+                    this.Position.Y = value;
+                }
+            },
+            Width: {
+                get: function () {
+                    return this.Position.Width;
+                },
+                set: function (value) {
+                    this.Position.Width = value;
+                }
+            },
+            Height: {
+                get: function () {
+                    return this.Position.Height;
+                },
+                set: function (value) {
+                    this.Position.Height = value;
+                }
+            }
+        },
+        ctors: {
+            init: function () {
+                this.Position = new JoelFive.Rectangle();
+            }
+        },
+        methods: {
+            Parse1: function (dynamic) {
+                var $step = 0,
+                    $task1, 
+                    $taskResult1, 
+                    $jumpFromFinally, 
+                    $tcs = new System.Threading.Tasks.TaskCompletionSource(), 
+                    $returnValue, 
+                    imageString, 
+                    $async_e, 
+                    $asyncBody = Bridge.fn.bind(this, function () {
+                        try {
+                            for (;;) {
+                                $step = System.Array.min([0,1,2,3,4], $step);
+                                switch ($step) {
+                                    case 0: {
+                                        this.X = dynamic.x;
+                                        this.Y = dynamic.y;
+                                        this.Width = dynamic.width;
+                                        this.Height = dynamic.height;
+                                        imageString = dynamic.image;
+                                        if (imageString.charCodeAt(0) === 35) {
+                                            $step = 1;
+                                            continue;
+                                        } else  {
+                                            $step = 2;
+                                            continue;
+                                        }
+                                    }
+                                    case 1: {
+                                        this.Image = imageString;
+                                        $step = 4;
+                                        continue;
+                                    }
+                                    case 2: {
+                                        $task1 = JoelFive.App.LoadImage(imageString);
+                                        $step = 3;
+                                        $task1.continueWith($asyncBody);
+                                        return;
+                                    }
+                                    case 3: {
+                                        $taskResult1 = $task1.getAwaitedResult();
+                                        this.Image = $taskResult1;
+                                        $step = 4;
+                                        continue;
+                                    }
+                                    case 4: {
+                                        $tcs.setResult(null);
+                                        return;
+                                    }
+                                    default: {
+                                        $tcs.setResult(null);
+                                        return;
+                                    }
+                                }
+                            }
+                        } catch($async_e1) {
+                            $async_e = System.Exception.create($async_e1);
+                            $tcs.setException($async_e);
+                        }
+                    }, arguments);
+
+                $asyncBody();
+                return $tcs.task;
+            }
+        }
+    });
+
+    Bridge.define("JoelFive.Game", {
+        inherits: [JoelFive.GameObject],
+        statics: {
+            methods: {
+                Parse: function (dynamic) {
+                    var $step = 0,
+                        $task1, 
+                        $taskResult1, 
+                        $jumpFromFinally, 
+                        $tcs = new System.Threading.Tasks.TaskCompletionSource(), 
+                        $returnValue, 
+                        children, 
+                        game, 
+                        $t, 
+                        $t1, 
+                        $t2, 
+                        item, 
+                        $async_e, 
+                        $asyncBody = Bridge.fn.bind(this, function () {
+                            try {
+                                for (;;) {
+                                    $step = System.Array.min([0,1,2,3,4], $step);
+                                    switch ($step) {
+                                        case 0: {
+                                            game = ($t=new JoelFive.Game(), $t.Children = (children = new (System.Collections.Generic.List$1(JoelFive.GameObject))()), $t.Interval = dynamic.interval, $t.DrawInterval = dynamic.drawInterval, $t.Canvas = ($t1=document.createElement('canvas'), $t1.width = dynamic.width, $t1.height = dynamic.height, $t1), $t);
+                                            $t2 = Bridge.getEnumerator(Bridge.cast(dynamic.children, System.Array.type(System.Object)));
+                                            $step = 1;
+                                            continue;
+                                        }
+                                        case 1: {
+                                            if ($t2.moveNext()) {
+                                                item = $t2.Current;
+                                                $step = 2;
+                                                continue;
+                                            }
+                                            $step = 4;
+                                            continue;
+                                        }
+                                        case 2: {
+                                            $task1 = JoelFive.GameObject.Parse(item);
+                                            $step = 3;
+                                            $task1.continueWith($asyncBody);
+                                            return;
+                                        }
+                                        case 3: {
+                                            $taskResult1 = $task1.getAwaitedResult();
+                                            children.add($taskResult1);
+                                            $step = 1;
+                                            continue;
+                                        }
+                                        case 4: {
+                                            $tcs.setResult(game);
+                                            return;
+                                        }
+                                        default: {
+                                            $tcs.setResult(null);
+                                            return;
+                                        }
+                                    }
+                                }
+                            } catch($async_e1) {
+                                $async_e = System.Exception.create($async_e1);
+                                $tcs.setException($async_e);
+                            }
+                        }, arguments);
+
+                    $asyncBody();
+                    return $tcs.task;
+                }
+            }
+        },
+        fields: {
+            Children: null,
+            Interval: 0,
+            DrawInterval: 0,
+            Canvas: null
+        },
+        methods: {
+            Start: function () {
+                Bridge.global.setInterval(Bridge.fn.cacheBind(this, this.Update), this.Interval);
+                Bridge.global.setInterval(Bridge.fn.cacheBind(this, this.Draw), this.DrawInterval);
+            },
+            Draw: function () {
+                var $t;
+                var context = this.Canvas.getContext("2d");
+                context.clearRect(0, 0, this.Canvas.width, this.Canvas.height);
+                $t = Bridge.getEnumerator(this.Children);
+                try {
+                    while ($t.moveNext()) {
+                        var child = $t.Current;
+                        if (Bridge.is(child, JoelFive.DrawnGameObject)) {
+                            var drawObject = child; /// 'is' expression's given expression is never of the provided type
+
+
+                            if (Bridge.is(drawObject.Image, System.String)) {
+                                context.fillStyle = drawObject.Image;
+                                context.fillRect(drawObject.X, drawObject.Y, drawObject.Width, drawObject.Height);
+                            } else {
+                                context.drawImage(drawObject.Image, drawObject.X, drawObject.Y);
+                            }
+                        }
+                    }
+                }finally {
+                    if (Bridge.is($t, System.IDisposable)) {
+                        $t.System$IDisposable$dispose();
+                    }
+                }},
+            Update: function () {
+                var $t;
+                $t = Bridge.getEnumerator(this.Children);
+                try {
+                    while ($t.moveNext()) {
+                        var child = $t.Current;
+                        if (Bridge.is(child, JoelFive.RealGameObject)) {
+                            child.Update(this);
+                        }
+                    }
+                }finally {
+                    if (Bridge.is($t, System.IDisposable)) {
+                        $t.System$IDisposable$dispose();
+                    }
+                }}
+        }
+    });
+
+    Bridge.define("JoelFive.RealGameObject", {
+        inherits: [JoelFive.DrawnGameObject],
+        fields: {
+            Gravity: 0
+        },
+        methods: {
+            Parse2: function (dynamic) {
+                var $step = 0,
+                    $task1, 
+                    $jumpFromFinally, 
+                    $tcs = new System.Threading.Tasks.TaskCompletionSource(), 
+                    $returnValue, 
+                    $async_e, 
+                    $asyncBody = Bridge.fn.bind(this, function () {
+                        try {
+                            for (;;) {
+                                $step = System.Array.min([0,1], $step);
+                                switch ($step) {
+                                    case 0: {
+                                        this.Gravity = dynamic.gravity;
+                                        $task1 = this.Parse1(dynamic);
+                                        $step = 1;
+                                        $task1.continueWith($asyncBody);
+                                        return;
+                                    }
+                                    case 1: {
+                                        $task1.getAwaitedResult();
+                                        $tcs.setResult(null);
+                                        return;
+                                    }
+                                    default: {
+                                        $tcs.setResult(null);
+                                        return;
+                                    }
+                                }
+                            }
+                        } catch($async_e1) {
+                            $async_e = System.Exception.create($async_e1);
+                            $tcs.setException($async_e);
+                        }
+                    }, arguments);
+
+                $asyncBody();
+                return $tcs.task;
+            },
+            Update: function ($in) {
+                var $t, $t1;
+                var intersects = new (System.Collections.Generic.List$1(JoelFive.RealGameObject))();
+                $t = Bridge.getEnumerator($in.Children);
+                try {
+                    while ($t.moveNext()) {
+                        var child = $t.Current;
+                        if (Bridge.is(child, JoelFive.RealGameObject)) {
+                            var realGameObject = child;
+                            var doesIntersect = ($t1=new JoelFive.Rectangle(), $t1.X = this.X, $t1.Width = this.Width, $t1.Y = this.Y + this.Height, $t1.Height = this.Gravity, $t1).Intersects(realGameObject.Position.$clone());
+                            if (doesIntersect) {
+                                intersects.add(realGameObject);
+                            }
+                        }
+                    }
+                }finally {
+                    if (Bridge.is($t, System.IDisposable)) {
+                        $t.System$IDisposable$dispose();
+                    }
+                }if (intersects.Count === 0) {
+                    this.Y += this.Gravity;
+                } else {
+                    var min = System.Linq.Enumerable.from(intersects).min(Bridge.fn.bind(this, $asm.$.JoelFive.RealGameObject.f1));
+                    this.Y = min;
+                }
+            }
+        }
+    });
+
+    Bridge.ns("JoelFive.RealGameObject", $asm.$);
+
+    Bridge.apply($asm.$.JoelFive.RealGameObject, {
+        f1: function (v) {
+            return v.Y - this.Height;
+        }
+    });
+});
