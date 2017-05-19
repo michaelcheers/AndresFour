@@ -38,7 +38,7 @@ namespace JoelFive
                 Y += Gravity;
             else
             {
-                double min = intersects.Min(v => v.Y);
+                double min = intersects.Min(v => v.Y - Height);
                 Y = min;
             }
         }
