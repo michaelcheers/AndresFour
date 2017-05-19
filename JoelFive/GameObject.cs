@@ -17,12 +17,12 @@ namespace JoelFive
             {
                 case "real game object":
                     RealGameObject realGameObject = new RealGameObject();
-                    await realGameObject.Parse(realGameObject, @dynamic);
+                    await realGameObject.Parse2(@dynamic);
                     result = realGameObject;
                     break;
                 case "drawn game object":
                     DrawnGameObject drawnGameObject = new DrawnGameObject();
-                    await drawnGameObject.Parse(drawnGameObject, @dynamic);
+                    await drawnGameObject.Parse1(@dynamic);
                     result = drawnGameObject;
                     break;
             }

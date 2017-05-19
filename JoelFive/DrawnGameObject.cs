@@ -10,13 +10,54 @@ namespace JoelFive
 {
     public class DrawnGameObject : GameObject
     {
-        public double X;
-        public double Y;
-        public double Width;
-        public double Height;
+        public Rectangle Position = new Rectangle();
+        public double X
+        {
+            get
+            {
+                return Position.X;
+            }
+            set
+            {
+                Position.X = value;
+            }
+        }
+        public double Y
+        {
+            get
+            {
+                return Position.Y;
+            }
+            set
+            {
+                Position.Y = value;
+            }
+        }
+        public double Width
+        {
+            get
+            {
+                return Position.Width;
+            }
+            set
+            {
+                Position.Width = value;
+            }
+        }
+        public double Height
+        {
+            get
+            {
+                return Position.Height;
+            }
+            set
+            {
+                Position.Height = value;
+            }
+        }
         public Union<HTMLImageElement, string> Image;
 
-        public async Task Parse (DrawnGameObject gameObject, dynamic @dynamic)
+        public async Task Parse1 (dynamic @dynamic)
         {
             X = @dynamic.x;
             Y = @dynamic.y;

@@ -21,7 +21,12 @@ namespace JoelFive
             {
                 Children = children = new List<GameObject>(),
                 Interval = @dynamic.interval,
-                DrawInterval = @dynamic.drawInterval
+                DrawInterval = @dynamic.drawInterval,
+                Canvas = new HTMLCanvasElement
+                {
+                    Width = @dynamic.width,
+                    Height = @dynamic.height
+                }
             };
             foreach (var item in (dynamic[])@dynamic.children)
                 children.Add(await GameObject.Parse(item));
@@ -55,7 +60,9 @@ namespace JoelFive
         }
         public void Update ()
         {
-
+            foreach (var child in Children)
+                if (child is RealGameObject)
+                    child.As<RealGameObject>().Update(this);
         }
     }
 }
