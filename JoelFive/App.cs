@@ -8,39 +8,15 @@ namespace JoelFive
     public class App
     {
         public const double smallNumber = 0.0001;
-        public static async void Main()
+        public static async void Main ()
         {
-            Game game = await Game.Parse(
-                Script.ToPlainObject(new
-                {
-                    width = 500,
-                    height = 500,
-                    interval = 25,
-                    drawInterval = 25,
-                    children = new[]
-                    {
-                        Script.ToPlainObject(new
-                        {
-                            type = "real game object",
-                            x = 50,
-                            y = 50,
-                            width = 50,
-                            height = 50,
-                            image = "#ffc0c0",
-                            gravity = 1
-                        }),
-                        Script.ToPlainObject(new
-                        {
-                            type = "real game object",
-                            x = 50,
-                            y = 200,
-                            width = 50,
-                            height = 50,
-                            image = "#c0ffc0",
-                            gravity = 0
-                        })
-                    }
-                }));
+            var input = new HTMLInputElement();
+            Document.Body.AppendChild(input);
+            TaskCompletionSource<string> task = new TaskCompletionSource<string>();
+            input.OnInput = e => task.SetResult(input.Value);
+            string parseString = Global.Atob(await task.Task);
+            input.Style.Display = Display.None;
+            Game game = await Game.Create(JSON.Parse(parseString));
             Document.Body.AppendChild(game.Canvas);
             game.Start();
         }

@@ -10,8 +10,40 @@ namespace JoelFive
     {
         public double X;
         public double Y;
-        public double Width;
-        public double Height;
+        double _width;
+        double _height;
+        public double Width
+        {
+            get
+            {
+                return _width;
+            }
+            set
+            {
+                if (value < 0)
+                {
+                    X -= value;
+                    value = -value;
+                }
+                _width = value;
+            }
+        }
+        public double Height
+        {
+            get
+            {
+                return _height;
+            }
+            set
+            {
+                if (value < 0)
+                {
+                    Y -= value;
+                    value = -value;
+                }
+                _height = value;
+            }
+        }
 
         /// <summary>
         /// Gets whether or not the other <see cref="Rectangle"/> intersects with this rectangle.

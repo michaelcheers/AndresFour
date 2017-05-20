@@ -9,20 +9,25 @@ namespace JoelFive
 {
     public class GameObject
     {
-        public static async Task<GameObject> Parse (dynamic @dynamic)
+        public static async Task<GameObject> Create (dynamic @dynamic)
         {
             GameObject result = null;
             string type = @dynamic.type;
             switch (type)
             {
+                case "character":
+                    Character character = new Character();
+                    await character.Parse(@dynamic);
+                    result = character;
+                    break;
                 case "real game object":
                     RealGameObject realGameObject = new RealGameObject();
-                    await realGameObject.Parse2(@dynamic);
+                    await realGameObject.Parse(@dynamic);
                     result = realGameObject;
                     break;
                 case "drawn game object":
                     DrawnGameObject drawnGameObject = new DrawnGameObject();
-                    await drawnGameObject.Parse1(@dynamic);
+                    await drawnGameObject.Parse(@dynamic);
                     result = drawnGameObject;
                     break;
             }

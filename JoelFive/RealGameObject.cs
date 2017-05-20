@@ -10,12 +10,12 @@ namespace JoelFive
     {
         public int Gravity;
 
-        public async Task Parse2 (dynamic @dynamic)
+        public override async Task Parse (dynamic @dynamic)
         {
             Gravity = @dynamic.gravity;
-            await Parse1(@dynamic);
+            await base.Parse((object)@dynamic);
         }
-        public virtual void Update (Game @in)
+        public bool TryMove (Game @in, double NotMovingIn, ref double MovingIn, double NotMovingInLength, double MovingInLength, double Velocity, Func<Rectangle, double> GetMovingIn)
         {
             List<RealGameObject> intersects = new List<RealGameObject>();
             foreach (var child in @in.Children)
@@ -23,24 +23,71 @@ namespace JoelFive
                 if (child is RealGameObject)
                 {
                     var realGameObject = child.As<RealGameObject>();
-                    bool doesIntersect = new Rectangle
+                    var rect = new Rectangle
                     {
-                        X = X,
-                        Width = Width,
-                        Y = Y + Height,
-                        Height = Gravity
-                    }.Intersects(realGameObject.Position);
+                        X = NotMovingIn,
+                        Width = NotMovingInLength,
+                        Y = MovingIn + MovingInLength,
+                        Height = Velocity
+                    };
+                    if (GetMovingIn(rect) == rect.X)
+                    {
+                        double newX = rect.Y;
+                        double newY = rect.X;
+                        double newWidth = rect.Height;
+                        double newHeight = rect.Width;
+                        rect = new Rectangle
+                        {
+                            X = newX,
+                            Y = newY,
+                            Width = newWidth,
+                            Height = newHeight
+                        };
+                    }
+                    bool doesIntersect = rect.Intersects(realGameObject.Position);
                     if (doesIntersect)
                         intersects.Add(realGameObject);
                 }
             }
             if (intersects.Count == 0)
-                Y += Gravity;
+                MovingIn += Velocity;
             else
             {
-                double min = intersects.Min(v => v.Y - Height);
-                Y = min;
+                double movingInLength = MovingInLength;
+                double min = intersects.Min(v => GetMovingIn(v.Position) - movingInLength);
+                MovingIn = min;
+                return false;
             }
+            return true;
         }
+        public bool TryMove (Game @in, Vector2 velocity)
+        {
+            if (velocity.X != 0 && velocity.Y != 0)
+            {
+                bool canMove = true;
+                canMove = TryMove(@in, new Vector2
+                {
+                    X = velocity.X
+                }) ? canMove : false;
+                canMove = TryMove(@in, new Vector2
+                {
+                    Y = velocity.Y
+                }) ? canMove : false;
+                return canMove;
+            }
+            if (velocity.X != 0)
+                return TryMove(@in, Position.Y, ref Position.X, Position.Height, Position.Width, velocity.X, v => v.X);
+            if (velocity.Y != 0)
+                return TryMove(@in, Position.X, ref Position.Y, Position.Width, Position.Height, velocity.Y, v => v.Y);
+            return true;
+        }
+        public virtual void Update (Game @in)
+        {
+            onSolid = !TryMove(@in, new Vector2
+            {
+                Y = Gravity
+            });
+        }
+        public bool onSolid;
     }
 }

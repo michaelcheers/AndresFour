@@ -57,7 +57,7 @@ namespace JoelFive
         }
         public Union<HTMLImageElement, string> Image;
 
-        public async Task Parse1 (dynamic @dynamic)
+        public virtual async Task Parse (dynamic @dynamic)
         {
             X = @dynamic.x;
             Y = @dynamic.y;

@@ -14,7 +14,8 @@ namespace JoelFive
         public int Interval;
         public int DrawInterval;
         public HTMLCanvasElement Canvas;
-        public static new async Task<Game> Parse(dynamic @dynamic)
+        public HashSet<int> Down;
+        public static new async Task<Game> Create(dynamic @dynamic)
         {
             List<GameObject> children;
             Game game = new Game
@@ -26,14 +27,17 @@ namespace JoelFive
                 {
                     Width = @dynamic.width,
                     Height = @dynamic.height
-                }
+                },
+                Down = new HashSet<int>()
             };
             foreach (var item in (dynamic[])@dynamic.children)
-                children.Add(await GameObject.Parse(item));
+                children.Add(await GameObject.Create(item));
             return game;
         }
         public void Start ()
         {
+            Document.Body.OnKeyUp = e => Down.Remove(e.KeyCode);
+            Document.Body.OnKeyDown = e => Down.Add(e.KeyCode);
             Global.SetInterval(Update, Interval);
             Global.SetInterval(Draw, DrawInterval);
         }
