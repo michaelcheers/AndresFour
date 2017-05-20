@@ -15,8 +15,10 @@ namespace JoelFive
             Gravity = @dynamic.gravity;
             await base.Parse((object)@dynamic);
         }
-        public bool TryMove (Game @in, double NotMovingIn, ref double MovingIn, double NotMovingInLength, double MovingInLength, double Velocity, Func<Rectangle, double> GetMovingIn)
+        public bool TryMove (Game @in, double NotMovingIn, ref double MovingIn, double NotMovingInLength, double MovingInLength, double Velocity, Func<Rectangle, double> GetMovingIn, Func<Rectangle, double> GetMovingInLength)
         {
+            if (Velocity < 0)
+                return TryMoveNegative(@in, NotMovingIn, ref MovingIn, NotMovingInLength, MovingInLength, -Velocity, GetMovingIn, GetMovingInLength);
             List<RealGameObject> intersects = new List<RealGameObject>();
             foreach (var child in @in.Children)
             {
@@ -30,7 +32,7 @@ namespace JoelFive
                         Y = MovingIn + MovingInLength,
                         Height = Velocity
                     };
-                    if (GetMovingIn(rect) == rect.X)
+                    if (GetMovingIn(rect) == rect.X && GetMovingInLength(rect) == rect.Width)
                     {
                         double newX = rect.Y;
                         double newY = rect.X;
@@ -53,9 +55,52 @@ namespace JoelFive
                 MovingIn += Velocity;
             else
             {
-                double movingInLength = MovingInLength;
-                double min = intersects.Min(v => GetMovingIn(v.Position) - movingInLength);
+                double min = intersects.Min(v => GetMovingIn(v.Position) - MovingInLength);
                 MovingIn = min;
+                return false;
+            }
+            return true;
+        }
+        public bool TryMoveNegative (Game @in, double NotMovingIn, ref double MovingIn, double NotMovingInLength, double MovingInLength, double Velocity, Func<Rectangle, double> GetMovingIn, Func<Rectangle, double> GetMovingInLength)
+        {
+            List<RealGameObject> intersects = new List<RealGameObject>();
+            foreach (var child in @in.Children)
+            {
+                if (child is RealGameObject)
+                {
+                    var realGameObject = child.As<RealGameObject>();
+                    var rect = new Rectangle
+                    {
+                        X = NotMovingIn,
+                        Width = NotMovingInLength,
+                        Y = MovingIn - Velocity,
+                        Height = Velocity
+                    };
+                    if (GetMovingIn(rect) == rect.X && GetMovingInLength(rect) == rect.Width)
+                    {
+                        double newX = rect.Y;
+                        double newY = rect.X;
+                        double newWidth = rect.Height;
+                        double newHeight = rect.Width;
+                        rect = new Rectangle
+                        {
+                            X = newX,
+                            Y = newY,
+                            Width = newWidth,
+                            Height = newHeight
+                        };
+                    }
+                    bool doesIntersect = rect.Intersects(realGameObject.Position);
+                    if (doesIntersect)
+                        intersects.Add(realGameObject);
+                }
+            }
+            if (intersects.Count == 0)
+                MovingIn -= Velocity;
+            else
+            {
+                double max = intersects.Max(v => GetMovingIn(v.Position) + GetMovingInLength(v.Position));
+                MovingIn = max;
                 return false;
             }
             return true;
@@ -76,9 +121,9 @@ namespace JoelFive
                 return canMove;
             }
             if (velocity.X != 0)
-                return TryMove(@in, Position.Y, ref Position.X, Position.Height, Position.Width, velocity.X, v => v.X);
+                return TryMove(@in, Position.Y, ref Position.X, Position.Height, Position.Width, velocity.X, v => v.X, v => v.Width);
             if (velocity.Y != 0)
-                return TryMove(@in, Position.X, ref Position.Y, Position.Width, Position.Height, velocity.Y, v => v.Y);
+                return TryMove(@in, Position.X, ref Position.Y, Position.Width, Position.Height, velocity.Y, v => v.Y, v => v.Height);
             return true;
         }
         public virtual void Update (Game @in)

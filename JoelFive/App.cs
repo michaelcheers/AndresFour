@@ -17,6 +17,7 @@ namespace JoelFive
             string parseString = Global.Atob(await task.Task);
             input.Style.Display = Display.None;
             Game game = await Game.Create(JSON.Parse(parseString));
+            game.Canvas.Style.Border = "1px solid black";
             Document.Body.AppendChild(game.Canvas);
             game.Start();
         }

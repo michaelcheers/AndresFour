@@ -46,6 +46,7 @@ Bridge.assembly("JoelFive", function ($asm, globals) {
                             case 2: {
                                 $taskResult2 = $task2.getAwaitedResult();
                                 game = $taskResult2;
+                                game.Canvas.style.border = "1px solid black";
                                 document.body.appendChild(game.Canvas);
                                 game.Start();
                                 return;
@@ -609,8 +610,11 @@ Bridge.assembly("JoelFive", function ($asm, globals) {
                 $asyncBody();
                 return $tcs.task;
             },
-            TryMove$1: function ($in, NotMovingIn, MovingIn, NotMovingInLength, MovingInLength, Velocity, GetMovingIn) {
+            TryMove$1: function ($in, NotMovingIn, MovingIn, NotMovingInLength, MovingInLength, Velocity, GetMovingIn, GetMovingInLength) {
                 var $t, $t1, $t2;
+                if (Velocity < 0) {
+                    return this.TryMoveNegative($in, NotMovingIn, MovingIn, NotMovingInLength, MovingInLength, -Velocity, GetMovingIn, GetMovingInLength);
+                }
                 var intersects = new (System.Collections.Generic.List$1(JoelFive.RealGameObject))();
                 $t = Bridge.getEnumerator($in.Children);
                 try {
@@ -619,7 +623,7 @@ Bridge.assembly("JoelFive", function ($asm, globals) {
                         if (Bridge.is(child, JoelFive.RealGameObject)) {
                             var realGameObject = child;
                             var rect = ($t1=new JoelFive.Rectangle(), $t1.X = NotMovingIn, $t1.Width = NotMovingInLength, $t1.Y = MovingIn.v + MovingInLength, $t1.Height = Velocity, $t1);
-                            if (GetMovingIn(rect.$clone()) === rect.X) {
+                            if (GetMovingIn(rect.$clone()) === rect.X && GetMovingInLength(rect.$clone()) === rect.Width) {
                                 var newX = rect.Y;
                                 var newY = rect.X;
                                 var newWidth = rect.Height;
@@ -639,9 +643,8 @@ Bridge.assembly("JoelFive", function ($asm, globals) {
                 }if (intersects.Count === 0) {
                     MovingIn.v += Velocity;
                 } else {
-                    var movingInLength = MovingInLength;
                     var min = System.Linq.Enumerable.from(intersects).min(function (v) {
-                            return GetMovingIn(v.Position.$clone()) - movingInLength;
+                            return GetMovingIn(v.Position.$clone()) - MovingInLength;
                         });
                     MovingIn.v = min;
                     return false;
@@ -657,10 +660,48 @@ Bridge.assembly("JoelFive", function ($asm, globals) {
                     return canMove;
                 }
                 if (velocity.X !== 0) {
-                    return this.TryMove$1($in, this.Position.Y, Bridge.ref(this.Position, "X"), this.Position.Height, this.Position.Width, velocity.X, $asm.$.JoelFive.RealGameObject.f1);
+                    return this.TryMove$1($in, this.Position.Y, Bridge.ref(this.Position, "X"), this.Position.Height, this.Position.Width, velocity.X, $asm.$.JoelFive.RealGameObject.f1, $asm.$.JoelFive.RealGameObject.f2);
                 }
                 if (velocity.Y !== 0) {
-                    return this.TryMove$1($in, this.Position.X, Bridge.ref(this.Position, "Y"), this.Position.Width, this.Position.Height, velocity.Y, $asm.$.JoelFive.RealGameObject.f2);
+                    return this.TryMove$1($in, this.Position.X, Bridge.ref(this.Position, "Y"), this.Position.Width, this.Position.Height, velocity.Y, $asm.$.JoelFive.RealGameObject.f3, $asm.$.JoelFive.RealGameObject.f4);
+                }
+                return true;
+            },
+            TryMoveNegative: function ($in, NotMovingIn, MovingIn, NotMovingInLength, MovingInLength, Velocity, GetMovingIn, GetMovingInLength) {
+                var $t, $t1, $t2;
+                var intersects = new (System.Collections.Generic.List$1(JoelFive.RealGameObject))();
+                $t = Bridge.getEnumerator($in.Children);
+                try {
+                    while ($t.moveNext()) {
+                        var child = $t.Current;
+                        if (Bridge.is(child, JoelFive.RealGameObject)) {
+                            var realGameObject = child;
+                            var rect = ($t1=new JoelFive.Rectangle(), $t1.X = NotMovingIn, $t1.Width = NotMovingInLength, $t1.Y = MovingIn.v - Velocity, $t1.Height = Velocity, $t1);
+                            if (GetMovingIn(rect.$clone()) === rect.X && GetMovingInLength(rect.$clone()) === rect.Width) {
+                                var newX = rect.Y;
+                                var newY = rect.X;
+                                var newWidth = rect.Height;
+                                var newHeight = rect.Width;
+                                rect = ($t2=new JoelFive.Rectangle(), $t2.X = newX, $t2.Y = newY, $t2.Width = newWidth, $t2.Height = newHeight, $t2);
+                            }
+                            var doesIntersect = rect.Intersects(realGameObject.Position.$clone());
+                            if (doesIntersect) {
+                                intersects.add(realGameObject);
+                            }
+                        }
+                    }
+                }finally {
+                    if (Bridge.is($t, System.IDisposable)) {
+                        $t.System$IDisposable$dispose();
+                    }
+                }if (intersects.Count === 0) {
+                    MovingIn.v -= Velocity;
+                } else {
+                    var max = System.Linq.Enumerable.from(intersects).max(function (v) {
+                            return GetMovingIn(v.Position.$clone()) + GetMovingInLength(v.Position.$clone());
+                        });
+                    MovingIn.v = max;
+                    return false;
                 }
                 return true;
             },
@@ -678,7 +719,13 @@ Bridge.assembly("JoelFive", function ($asm, globals) {
             return v.X;
         },
         f2: function (v) {
+            return v.Width;
+        },
+        f3: function (v) {
             return v.Y;
+        },
+        f4: function (v) {
+            return v.Height;
         }
     });
 
