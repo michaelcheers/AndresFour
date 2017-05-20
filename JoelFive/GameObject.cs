@@ -7,8 +7,9 @@ using System.Threading.Tasks;
 
 namespace JoelFive
 {
-    public class GameObject
+    public abstract class GameObject
     {
+        public string Name;
         public static async Task<GameObject> Create (dynamic @dynamic)
         {
             GameObject result = null;
@@ -31,6 +32,8 @@ namespace JoelFive
                     result = drawnGameObject;
                     break;
             }
+            if (@dynamic.name != null)
+                result.Name = @dynamic.name;
             return result;
         }
     }

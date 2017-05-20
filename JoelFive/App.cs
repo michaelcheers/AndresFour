@@ -7,7 +7,6 @@ namespace JoelFive
 {
     public class App
     {
-        public const double smallNumber = 0.0001;
         public static async void Main ()
         {
             var input = new HTMLInputElement();
@@ -20,17 +19,6 @@ namespace JoelFive
             game.Canvas.Style.Border = "1px solid black";
             Document.Body.AppendChild(game.Canvas);
             game.Start();
-        }
-
-        public static Task<HTMLImageElement> LoadImage (string value)
-        {
-            HTMLImageElement image = new HTMLImageElement
-            {
-                Src = value
-            };
-            TaskCompletionSource<HTMLImageElement> task = new TaskCompletionSource<HTMLImageElement>();
-            image.OnLoad = e => task.SetResult(image);
-            return task.Task;
         }
     }
 }

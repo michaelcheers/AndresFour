@@ -59,16 +59,11 @@ Bridge.assembly("JoelFive", function ($asm, globals) {
                 }, arguments);
 
             $asyncBody();
-        },
+        }
+    });
+
+    Bridge.define("JoelFive.BridgeEssentials", {
         statics: {
-            fields: {
-                smallNumber: 0
-            },
-            ctors: {
-                init: function () {
-                    this.smallNumber = 0.0001;
-                }
-            },
             methods: {
                 LoadImage: function (value) {
                     var $t;
@@ -163,6 +158,9 @@ Bridge.assembly("JoelFive", function ($asm, globals) {
                                             continue;
                                         }
                                         case 7: {
+                                            if (dynamic.name != null) {
+                                                result.Name = dynamic.name;
+                                            }
                                             $tcs.setResult(result);
                                             return;
                                         }
@@ -182,6 +180,151 @@ Bridge.assembly("JoelFive", function ($asm, globals) {
                     return $tcs.task;
                 }
             }
+        },
+        fields: {
+            Name: null
+        }
+    });
+
+    Bridge.define("JoelFive.Game", {
+        statics: {
+            methods: {
+                Create: function (dynamic) {
+                    var $step = 0,
+                        $task1, 
+                        $taskResult1, 
+                        $jumpFromFinally, 
+                        $tcs = new System.Threading.Tasks.TaskCompletionSource(), 
+                        $returnValue, 
+                        children, 
+                        game, 
+                        $t, 
+                        $t1, 
+                        $t2, 
+                        item, 
+                        $async_e, 
+                        $asyncBody = Bridge.fn.bind(this, function () {
+                            try {
+                                for (;;) {
+                                    $step = System.Array.min([0,1,2,3,4], $step);
+                                    switch ($step) {
+                                        case 0: {
+                                            game = ($t=new JoelFive.Game(), $t.Children = (children = new (System.Collections.Generic.List$1(JoelFive.GameObject))()), $t.Interval = dynamic.interval, $t.DrawInterval = dynamic.drawInterval, $t.Canvas = ($t1=document.createElement('canvas'), $t1.width = dynamic.width, $t1.height = dynamic.height, $t1), $t.Down = new (System.Collections.Generic.HashSet$1(System.Int32)).ctor(), $t);
+                                            $t2 = Bridge.getEnumerator(Bridge.cast(dynamic.children, System.Array.type(System.Object)));
+                                            $step = 1;
+                                            continue;
+                                        }
+                                        case 1: {
+                                            if ($t2.moveNext()) {
+                                                item = $t2.Current;
+                                                $step = 2;
+                                                continue;
+                                            }
+                                            $step = 4;
+                                            continue;
+                                        }
+                                        case 2: {
+                                            $task1 = JoelFive.GameObject.Create(item);
+                                            $step = 3;
+                                            $task1.continueWith($asyncBody);
+                                            return;
+                                        }
+                                        case 3: {
+                                            $taskResult1 = $task1.getAwaitedResult();
+                                            children.add($taskResult1);
+                                            $step = 1;
+                                            continue;
+                                        }
+                                        case 4: {
+                                            $tcs.setResult(game);
+                                            return;
+                                        }
+                                        default: {
+                                            $tcs.setResult(null);
+                                            return;
+                                        }
+                                    }
+                                }
+                            } catch($async_e1) {
+                                $async_e = System.Exception.create($async_e1);
+                                $tcs.setException($async_e);
+                            }
+                        }, arguments);
+
+                    $asyncBody();
+                    return $tcs.task;
+                }
+            }
+        },
+        fields: {
+            Children: null,
+            Interval: 0,
+            DrawInterval: 0,
+            Canvas: null,
+            Down: null
+        },
+        methods: {
+            Start: function () {
+                document.body.onkeyup = Bridge.fn.bind(this, $asm.$.JoelFive.Game.f1);
+                document.body.onkeydown = Bridge.fn.bind(this, $asm.$.JoelFive.Game.f2);
+                Bridge.global.setInterval(Bridge.fn.cacheBind(this, this.Update), this.Interval);
+                Bridge.global.setInterval(Bridge.fn.cacheBind(this, this.Draw), this.DrawInterval);
+            },
+            Draw: function () {
+                var $t;
+                var context = this.Canvas.getContext("2d");
+                context.clearRect(0, 0, this.Canvas.width, this.Canvas.height);
+                $t = Bridge.getEnumerator(this.Children);
+                try {
+                    while ($t.moveNext()) {
+                        var child = $t.Current;
+                        if (Bridge.is(child, JoelFive.DrawnGameObject)) {
+                            var drawObject = child; /// 'is' expression's given expression is never of the provided type
+
+
+                            if (Bridge.is(drawObject.Image, System.String)) {
+                                context.fillStyle = drawObject.Image;
+                                context.fillRect(drawObject.X, drawObject.Y, drawObject.Width, drawObject.Height);
+                            } else {
+                                context.drawImage(drawObject.Image, drawObject.X, drawObject.Y);
+                            }
+                            if (drawObject.Selected) {
+                                context.strokeStyle = "#4286f4";
+                                context.strokeRect(((Bridge.Int.clip32(drawObject.X) - 1) | 0), ((Bridge.Int.clip32(drawObject.Y) - 1) | 0), ((Bridge.Int.clip32(drawObject.Width) + 2) | 0), ((Bridge.Int.clip32(drawObject.Height) + 2) | 0));
+                            }
+                        }
+                    }
+                }finally {
+                    if (Bridge.is($t, System.IDisposable)) {
+                        $t.System$IDisposable$dispose();
+                    }
+                }},
+            Update: function () {
+                var $t;
+                $t = Bridge.getEnumerator(this.Children);
+                try {
+                    while ($t.moveNext()) {
+                        var child = $t.Current;
+                        if (Bridge.is(child, JoelFive.RealGameObject)) {
+                            child.Update(this);
+                        }
+                    }
+                }finally {
+                    if (Bridge.is($t, System.IDisposable)) {
+                        $t.System$IDisposable$dispose();
+                    }
+                }}
+        }
+    });
+
+    Bridge.ns("JoelFive.Game", $asm.$);
+
+    Bridge.apply($asm.$.JoelFive.Game, {
+        f1: function (e) {
+            this.Down.remove(e.keyCode);
+        },
+        f2: function (e) {
+            this.Down.add(e.keyCode);
         }
     });
 
@@ -315,6 +458,7 @@ Bridge.assembly("JoelFive", function ($asm, globals) {
     Bridge.define("JoelFive.DrawnGameObject", {
         inherits: [JoelFive.GameObject],
         fields: {
+            Selected: false,
             Position: null,
             Image: null
         },
@@ -392,7 +536,7 @@ Bridge.assembly("JoelFive", function ($asm, globals) {
                                         continue;
                                     }
                                     case 2: {
-                                        $task1 = JoelFive.App.LoadImage(imageString);
+                                        $task1 = JoelFive.BridgeEssentials.LoadImage(imageString);
                                         $step = 3;
                                         $task1.continueWith($asyncBody);
                                         return;
@@ -422,145 +566,6 @@ Bridge.assembly("JoelFive", function ($asm, globals) {
                 $asyncBody();
                 return $tcs.task;
             }
-        }
-    });
-
-    Bridge.define("JoelFive.Game", {
-        inherits: [JoelFive.GameObject],
-        statics: {
-            methods: {
-                Create: function (dynamic) {
-                    var $step = 0,
-                        $task1, 
-                        $taskResult1, 
-                        $jumpFromFinally, 
-                        $tcs = new System.Threading.Tasks.TaskCompletionSource(), 
-                        $returnValue, 
-                        children, 
-                        game, 
-                        $t, 
-                        $t1, 
-                        $t2, 
-                        item, 
-                        $async_e, 
-                        $asyncBody = Bridge.fn.bind(this, function () {
-                            try {
-                                for (;;) {
-                                    $step = System.Array.min([0,1,2,3,4], $step);
-                                    switch ($step) {
-                                        case 0: {
-                                            game = ($t=new JoelFive.Game(), $t.Children = (children = new (System.Collections.Generic.List$1(JoelFive.GameObject))()), $t.Interval = dynamic.interval, $t.DrawInterval = dynamic.drawInterval, $t.Canvas = ($t1=document.createElement('canvas'), $t1.width = dynamic.width, $t1.height = dynamic.height, $t1), $t.Down = new (System.Collections.Generic.HashSet$1(System.Int32)).ctor(), $t);
-                                            $t2 = Bridge.getEnumerator(Bridge.cast(dynamic.children, System.Array.type(System.Object)));
-                                            $step = 1;
-                                            continue;
-                                        }
-                                        case 1: {
-                                            if ($t2.moveNext()) {
-                                                item = $t2.Current;
-                                                $step = 2;
-                                                continue;
-                                            }
-                                            $step = 4;
-                                            continue;
-                                        }
-                                        case 2: {
-                                            $task1 = JoelFive.GameObject.Create(item);
-                                            $step = 3;
-                                            $task1.continueWith($asyncBody);
-                                            return;
-                                        }
-                                        case 3: {
-                                            $taskResult1 = $task1.getAwaitedResult();
-                                            children.add($taskResult1);
-                                            $step = 1;
-                                            continue;
-                                        }
-                                        case 4: {
-                                            $tcs.setResult(game);
-                                            return;
-                                        }
-                                        default: {
-                                            $tcs.setResult(null);
-                                            return;
-                                        }
-                                    }
-                                }
-                            } catch($async_e1) {
-                                $async_e = System.Exception.create($async_e1);
-                                $tcs.setException($async_e);
-                            }
-                        }, arguments);
-
-                    $asyncBody();
-                    return $tcs.task;
-                }
-            }
-        },
-        fields: {
-            Children: null,
-            Interval: 0,
-            DrawInterval: 0,
-            Canvas: null,
-            Down: null
-        },
-        methods: {
-            Start: function () {
-                document.body.onkeyup = Bridge.fn.bind(this, $asm.$.JoelFive.Game.f1);
-                document.body.onkeydown = Bridge.fn.bind(this, $asm.$.JoelFive.Game.f2);
-                Bridge.global.setInterval(Bridge.fn.cacheBind(this, this.Update), this.Interval);
-                Bridge.global.setInterval(Bridge.fn.cacheBind(this, this.Draw), this.DrawInterval);
-            },
-            Draw: function () {
-                var $t;
-                var context = this.Canvas.getContext("2d");
-                context.clearRect(0, 0, this.Canvas.width, this.Canvas.height);
-                $t = Bridge.getEnumerator(this.Children);
-                try {
-                    while ($t.moveNext()) {
-                        var child = $t.Current;
-                        if (Bridge.is(child, JoelFive.DrawnGameObject)) {
-                            var drawObject = child; /// 'is' expression's given expression is never of the provided type
-
-
-                            if (Bridge.is(drawObject.Image, System.String)) {
-                                context.fillStyle = drawObject.Image;
-                                context.fillRect(drawObject.X, drawObject.Y, drawObject.Width, drawObject.Height);
-                            } else {
-                                context.drawImage(drawObject.Image, drawObject.X, drawObject.Y);
-                            }
-                        }
-                    }
-                }finally {
-                    if (Bridge.is($t, System.IDisposable)) {
-                        $t.System$IDisposable$dispose();
-                    }
-                }},
-            Update: function () {
-                var $t;
-                $t = Bridge.getEnumerator(this.Children);
-                try {
-                    while ($t.moveNext()) {
-                        var child = $t.Current;
-                        if (Bridge.is(child, JoelFive.RealGameObject)) {
-                            child.Update(this);
-                        }
-                    }
-                }finally {
-                    if (Bridge.is($t, System.IDisposable)) {
-                        $t.System$IDisposable$dispose();
-                    }
-                }}
-        }
-    });
-
-    Bridge.ns("JoelFive.Game", $asm.$);
-
-    Bridge.apply($asm.$.JoelFive.Game, {
-        f1: function (e) {
-            this.Down.remove(e.keyCode);
-        },
-        f2: function (e) {
-            this.Down.add(e.keyCode);
         }
     });
 

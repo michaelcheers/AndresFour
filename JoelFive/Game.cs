@@ -8,14 +8,14 @@ using System.Threading.Tasks;
 
 namespace JoelFive
 {
-    public class Game : GameObject
+    public class Game
     {
         public List<GameObject> Children;
         public int Interval;
         public int DrawInterval;
         public HTMLCanvasElement Canvas;
         public HashSet<int> Down;
-        public static new async Task<Game> Create(dynamic @dynamic)
+        public static async Task<Game> Create(dynamic @dynamic)
         {
             List<GameObject> children;
             Game game = new Game
@@ -59,6 +59,11 @@ namespace JoelFive
                     }
                     else
                         context.DrawImage(drawObject.Image.As<HTMLImageElement>(), drawObject.X, drawObject.Y);
+                    if (drawObject.Selected)
+                    {
+                        context.StrokeStyle = "#4286f4";
+                        context.StrokeRect((int)drawObject.X - 1, (int)drawObject.Y - 1, (int)drawObject.Width + 2, (int)drawObject.Height + 2);
+                    }
                 }
             }
         }

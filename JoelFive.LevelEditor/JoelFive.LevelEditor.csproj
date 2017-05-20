@@ -36,6 +36,33 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="..\JoelFive\BridgeEssentials.cs">
+      <Link>BridgeEssentials.cs</Link>
+    </Compile>
+    <Compile Include="..\JoelFive\Character.cs">
+      <Link>Character.cs</Link>
+    </Compile>
+    <Compile Include="..\JoelFive\DrawnGameObject.cs">
+      <Link>DrawnGameObject.cs</Link>
+    </Compile>
+    <Compile Include="..\JoelFive\Game.cs">
+      <Link>Game.cs</Link>
+    </Compile>
+    <Compile Include="..\JoelFive\GameObject.cs">
+      <Link>GameObject.cs</Link>
+    </Compile>
+    <Compile Include="..\JoelFive\Movement.cs">
+      <Link>Movement.cs</Link>
+    </Compile>
+    <Compile Include="..\JoelFive\RealGameObject.cs">
+      <Link>RealGameObject.cs</Link>
+    </Compile>
+    <Compile Include="..\JoelFive\Rectangle.cs">
+      <Link>Rectangle.cs</Link>
+    </Compile>
+    <Compile Include="..\JoelFive\Vector2.cs">
+      <Link>Vector2.cs</Link>
+    </Compile>
     <Compile Include="App.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -49,6 +76,9 @@
   <ItemGroup>
     <Reference Include="Bridge, Version=16.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Bridge.Core.16.0.0-beta\lib\net40\Bridge.dll</HintPath>
+    </Reference>
+    <Reference Include="Bridge.Collections, Version=1.3.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Bridge.Collections.1.3.4\lib\net40\Bridge.Collections.dll</HintPath>
     </Reference>
     <Reference Include="Bridge.Html5, Version=16.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Bridge.Html5.16.0.0-beta\lib\net40\Bridge.Html5.dll</HintPath>

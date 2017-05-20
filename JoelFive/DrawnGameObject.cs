@@ -10,6 +10,7 @@ namespace JoelFive
 {
     public class DrawnGameObject : GameObject
     {
+        public bool Selected;
         public Rectangle Position = new Rectangle();
         public double X
         {
@@ -67,7 +68,7 @@ namespace JoelFive
             if (imageString[0] == '#')
                 Image = imageString;
             else
-                Image = await App.LoadImage(imageString);
+                Image = await BridgeEssentials.LoadImage(imageString);
         }
     }
 }
