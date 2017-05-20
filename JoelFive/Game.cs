@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Runtime.CompilerServices;
 
 namespace JoelFive
 {
@@ -41,6 +42,15 @@ namespace JoelFive
             Global.SetInterval(Update, Interval);
             Global.SetInterval(Draw, DrawInterval);
         }
+        public override dynamic ToDynamic() =>
+            Script.ToPlainObject(new
+            {
+                width = Canvas.Width,
+                height = Canvas.Height,
+                interval = Interval,
+                drawInterval = DrawInterval,
+                children = Children.ConvertAll(v => v.ToDynamic()).ToArray()
+            });
         public void Draw ()
         {
             var context = Canvas.GetContext(CanvasTypes.CanvasContext2DType.CanvasRenderingContext2D);

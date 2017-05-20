@@ -14,7 +14,10 @@ Bridge.assembly("JoelFive", function ($asm, globals) {
                 $task2, 
                 $taskResult2, 
                 $jumpFromFinally, 
+                start, 
                 input, 
+                file, 
+                $t, 
                 task, 
                 parseString, 
                 game, 
@@ -23,11 +26,47 @@ Bridge.assembly("JoelFive", function ($asm, globals) {
                         $step = System.Array.min([0,1,2], $step);
                         switch ($step) {
                             case 0: {
+                                start = document.createElement('div');
                                 input = document.createElement('input');
-                                document.body.appendChild(input);
+                                file = ($t=document.createElement('input'), $t.type = "file", $t);
+                                start.appendChild(input);
+                                start.appendChild(document.createTextNode(" or"));
+                                start.appendChild(document.createElement('br'));
+                                start.appendChild(file);
+                                document.body.appendChild(start);
                                 task = new System.Threading.Tasks.TaskCompletionSource();
                                 input.oninput = function (e) {
                                     task.setResult(input.value);
+                                };
+                                file.onchange = function (e) {
+                                    var $step = 0,
+                                        $task1, 
+                                        $taskResult1, 
+                                        e, 
+                                        $jumpFromFinally, 
+                                        $asyncBody = Bridge.fn.bind(this, function () {
+                                            for (;;) {
+                                                $step = System.Array.min([0,1], $step);
+                                                switch ($step) {
+                                                    case 0: {
+                                                        $task1 = JoelFive.App.FileRead(file);
+                                                        $step = 1;
+                                                        $task1.continueWith($asyncBody, true);
+                                                        return;
+                                                    }
+                                                    case 1: {
+                                                        $taskResult1 = $task1.getAwaitedResult();
+                                                        task.setResult($taskResult1)
+                                                        return;
+                                                    }
+                                                    default: {
+                                                        return;
+                                                    }
+                                                }
+                                            }
+                                        }, arguments);
+
+                                    $asyncBody();
                                 };
                                 $task1 = task.task;
                                 $step = 1;
@@ -37,7 +76,7 @@ Bridge.assembly("JoelFive", function ($asm, globals) {
                             case 1: {
                                 $taskResult1 = $task1.getAwaitedResult();
                                 parseString = Bridge.global.atob($taskResult1);
-                                input.style.display = "none";
+                                start.style.display = "none";
                                 $task2 = JoelFive.Game.Create(JSON.parse(parseString));
                                 $step = 2;
                                 $task2.continueWith($asyncBody, true);
@@ -59,6 +98,20 @@ Bridge.assembly("JoelFive", function ($asm, globals) {
                 }, arguments);
 
             $asyncBody();
+        },
+        statics: {
+            methods: {
+                FileRead: function (fileInput) {
+                    var file = fileInput.files[System.Array.index(0, fileInput.files)];
+                    var fileReader = new FileReader();
+                    var task = new System.Threading.Tasks.TaskCompletionSource();
+                    fileReader.onload = function (e) {
+                        task.setResult(fileReader.result);
+                    };
+                    fileReader.readAsText(file);
+                    return task.task;
+                }
+            }
         }
     });
 
@@ -103,15 +156,15 @@ Bridge.assembly("JoelFive", function ($asm, globals) {
                                         case 0: {
                                             result = null;
                                             type = dynamic.type;
-                                            if (type === "character") {
+                                            if (type === JoelFive.Character.Type) {
                                                 $step = 1;
                                                 continue;
                                             }
-                                            else if (type === "real game object") {
+                                            else if (type === JoelFive.RealGameObject.Type) {
                                                 $step = 3;
                                                 continue;
                                             }
-                                            else if (type === "drawn game object") {
+                                            else if (type === JoelFive.DrawnGameObject.Type) {
                                                 $step = 5;
                                                 continue;
                                             }
@@ -183,6 +236,31 @@ Bridge.assembly("JoelFive", function ($asm, globals) {
         },
         fields: {
             Name: null
+        },
+        methods: {
+            Save: function (dynamic) {
+                dynamic.name = this.Name;
+            },
+            toDynamic: function () {
+                var result = {  };
+                var type;
+                if (Bridge.is(this, JoelFive.Character)) {
+                    type = JoelFive.Character.Type;
+                } else {
+                    if (Bridge.is(this, JoelFive.RealGameObject)) {
+                        type = JoelFive.RealGameObject.Type;
+                    } else {
+                        if (Bridge.is(this, JoelFive.DrawnGameObject)) {
+                            type = JoelFive.DrawnGameObject.Type;
+                        } else {
+                            throw new System.Exception(System.String.format("Invalid type: {0}", Bridge.getType(this)));
+                        }
+                    }
+                }
+                result.type = type;
+                this.Save(result);
+                return result;
+            }
         }
     });
 
@@ -270,6 +348,9 @@ Bridge.assembly("JoelFive", function ($asm, globals) {
                 Bridge.global.setInterval(Bridge.fn.cacheBind(this, this.Update), this.Interval);
                 Bridge.global.setInterval(Bridge.fn.cacheBind(this, this.Draw), this.DrawInterval);
             },
+            toDynamic: function () {
+                return { width: this.Canvas.width, height: this.Canvas.height, interval: this.Interval, drawInterval: this.DrawInterval, children: this.Children.convertAll(System.Object, $asm.$.JoelFive.Game.f3).toArray() };
+            },
             Draw: function () {
                 var $t;
                 var context = this.Canvas.getContext("2d");
@@ -325,6 +406,9 @@ Bridge.assembly("JoelFive", function ($asm, globals) {
         },
         f2: function (e) {
             this.Down.add(e.keyCode);
+        },
+        f3: function (v) {
+            return v.toDynamic();
         }
     });
 
@@ -457,6 +541,16 @@ Bridge.assembly("JoelFive", function ($asm, globals) {
 
     Bridge.define("JoelFive.DrawnGameObject", {
         inherits: [JoelFive.GameObject],
+        statics: {
+            fields: {
+                Type: null
+            },
+            ctors: {
+                init: function () {
+                    this.Type = "drawn game object";
+                }
+            }
+        },
         fields: {
             Selected: false,
             Position: null,
@@ -502,6 +596,20 @@ Bridge.assembly("JoelFive", function ($asm, globals) {
             }
         },
         methods: {
+            Save: function (dynamic) {
+                dynamic.x = this.X;
+                dynamic.y = this.Y;
+                dynamic.width = this.Width;
+                dynamic.height = this.Height; /// 'is' expression's given expression is never of the provided type
+
+
+                if (Bridge.is(this.Image, HTMLImageElement)) {
+                    dynamic.image = this.Image.src;
+                } else {
+                    dynamic.image = this.Image;
+                }
+                JoelFive.GameObject.prototype.Save.call(this, dynamic);
+            },
             Parse: function (dynamic) {
                 var $step = 0,
                     $task1, 
@@ -571,11 +679,25 @@ Bridge.assembly("JoelFive", function ($asm, globals) {
 
     Bridge.define("JoelFive.RealGameObject", {
         inherits: [JoelFive.DrawnGameObject],
+        statics: {
+            fields: {
+                Type: null
+            },
+            ctors: {
+                init: function () {
+                    this.Type = "real game object";
+                }
+            }
+        },
         fields: {
             Gravity: 0,
             onSolid: false
         },
         methods: {
+            Save: function (dynamic) {
+                dynamic.gravity = this.Gravity;
+                JoelFive.DrawnGameObject.prototype.Save.call(this, dynamic);
+            },
             Parse: function (dynamic) {
                 var $step = 0,
                     $task1, 
@@ -736,10 +858,24 @@ Bridge.assembly("JoelFive", function ($asm, globals) {
 
     Bridge.define("JoelFive.Character", {
         inherits: [JoelFive.RealGameObject],
+        statics: {
+            fields: {
+                Type: null
+            },
+            ctors: {
+                init: function () {
+                    this.Type = "character";
+                }
+            }
+        },
         fields: {
             movements: null
         },
         methods: {
+            Save: function (dynamic) {
+                dynamic.movements = this.movements.convertAll(System.Object, $asm.$.JoelFive.Character.f1).toArray();
+                JoelFive.RealGameObject.prototype.Save.call(this, dynamic);
+            },
             Update: function ($in) {
                 var $t, $t1;
                 JoelFive.RealGameObject.prototype.Update.call(this, $in);
@@ -819,6 +955,14 @@ Bridge.assembly("JoelFive", function ($asm, globals) {
                 $asyncBody();
                 return $tcs.task;
             }
+        }
+    });
+
+    Bridge.ns("JoelFive.Character", $asm.$);
+
+    Bridge.apply($asm.$.JoelFive.Character, {
+        f1: function (v) {
+            return { keys: v.Keys.toArray(), x: v.Velocity.X, y: v.Velocity.Y };
         }
     });
 });

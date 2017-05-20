@@ -12,14 +12,44 @@ namespace JoelFive.LevelEditor
         static HTMLDivElement right;
         static HTMLTableElement table;
 
+        static void Save ()
+        {
+            HTMLAnchorElement download = new HTMLAnchorElement
+            {
+                Download = "level.dat",
+                Href = $"data:text/plain;charset=UTF-8,{Global.Btoa(JSON.Stringify(game.ToDynamic()))}"
+            };
+            download.Click();
+        }
+
+        static Task<string> FileRead (HTMLInputElement fileInput)
+        {
+            var file = fileInput.Files[0];
+            dynamic fileReader = Script.Write<dynamic>("new FileReader()");
+            TaskCompletionSource<string> task = new TaskCompletionSource<string>();
+            fileReader.onload = (Action<Event>)(e => task.SetResult(fileReader.result));
+            fileReader.readAsText(file);
+            return task.Task;
+        }
+
         public static async void Main()
         {
+            HTMLDivElement start = new HTMLDivElement();
             HTMLInputElement input = new HTMLInputElement();
-            Document.Body.AppendChild(input);
+            HTMLInputElement file = new HTMLInputElement
+            {
+                Type = InputType.File
+            };
+            start.AppendChild(input);
+            start.AppendChild(new Text(" or"));
+            start.AppendChild(new HTMLBRElement());
+            start.AppendChild(file);
+            Document.Body.AppendChild(start);
             TaskCompletionSource<string> task = new TaskCompletionSource<string>();
             input.OnInput = e => task.SetResult(input.Value);
+            file.OnChange = async e => task.SetResult(await FileRead(file));
             string parseString = Global.Atob(await task.Task);
-            input.Style.Display = Display.None;
+            start.Style.Display = Display.None;
             game = await Game.Create(JSON.Parse(parseString));
             game.Canvas.Style.Border = "1px solid black";
             Document.Body.AppendChild(left = new HTMLDivElement());
@@ -30,6 +60,15 @@ namespace JoelFive.LevelEditor
             left.Style.CssFloat = Float.Left;
             right.Style.CssFloat = Float.Right;
             left.AppendChild(game.Canvas);
+            HTMLButtonElement button = new HTMLButtonElement
+            {
+                InnerHTML = "Save",
+                OnClick = e => Save()
+            };
+            button.Style.Position = Position.Fixed;
+            button.Style.Bottom = "0";
+            button.Style.Left = "0";
+            Document.Body.AppendChild(button);
             Reload();
         }
 

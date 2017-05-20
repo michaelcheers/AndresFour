@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Bridge;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,7 +9,19 @@ namespace JoelFive
 {
     public class Character : RealGameObject
     {
+        public new const string Type = "character";
         public List<Movement> movements;
+
+        public override void Save(dynamic dynamic)
+        {
+            dynamic.movements = movements.ConvertAll(v => Script.ToPlainObject(new
+            {
+                keys = v.Keys.ToArray(),
+                x = v.Velocity.X,
+                y = v.Velocity.Y
+            })).ToArray();
+            base.Save((object)dynamic);
+        }
 
         public override void Update (Game @in)
         {

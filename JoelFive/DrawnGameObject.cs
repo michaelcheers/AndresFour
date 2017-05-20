@@ -10,6 +10,21 @@ namespace JoelFive
 {
     public class DrawnGameObject : GameObject
     {
+        public const string Type = "drawn game object";
+        public override void Save (dynamic @dynamic)
+        {
+            @dynamic.x = X;
+            @dynamic.y = Y;
+            @dynamic.width = Width;
+            @dynamic.height = Height;
+#pragma warning disable CS0184 // 'is' expression's given expression is never of the provided type
+            if (Image is HTMLImageElement)
+#pragma warning restore CS0184 // 'is' expression's given expression is never of the provided type
+                @dynamic.image = ((HTMLImageElement)Image).Src;
+            else
+                @dynamic.image = Image;
+            base.Save((object)@dynamic);
+        }
         public bool Selected;
         public Rectangle Position = new Rectangle();
         public double X

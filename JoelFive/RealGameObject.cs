@@ -8,7 +8,14 @@ namespace JoelFive
 {
     public class RealGameObject : DrawnGameObject
     {
+        public new const string Type = "real game object";
         public int Gravity;
+
+        public override void Save(dynamic dynamic)
+        {
+            dynamic.gravity = Gravity;
+            base.Save((object)dynamic);
+        }
 
         public override async Task Parse (dynamic @dynamic)
         {
