@@ -465,27 +465,32 @@ Bridge.assembly("JoelFive.LevelEditor", function ($asm, globals) {
                     JoelFive.LevelEditor.App.Reload();
                 },
                 Reload: function () {
-                    var $t, $t1, $t2, $t3, $t4;
+                    var $t, $t1, $t2, $t3, $t4, $t5;
                     JoelFive.LevelEditor.App.table.innerHTML = "";
-                    $t = Bridge.getEnumerator(JoelFive.LevelEditor.App.game.Children);
+                    var row1 = document.createElement('tr');
+                    JoelFive.LevelEditor.App.table.appendChild(row1);
+                    var cell1 = document.createElement('td');
+                    cell1.appendChild(($t=document.createElement('a'), $t.href = "javascript:void(0)", $t.onclick = $asm.$.JoelFive.LevelEditor.App.f2, $t.innerHTML = "Unselect", $t));
+                    row1.appendChild(cell1);
+                    $t1 = Bridge.getEnumerator(JoelFive.LevelEditor.App.game.Children);
                     try {
-                        while ($t.moveNext()) {
-                            $t1 = (function () {
-                                var gameObject = $t.Current;
+                        while ($t1.moveNext()) {
+                            $t2 = (function () {
+                                var gameObject = $t1.Current;
                                 if (System.String.isNullOrEmpty(gameObject.Name)) {
                                     return {jump:1};
                                 }
                                 var row = document.createElement('tr');
                                 var cell = document.createElement('td');
                                 cell.style.borderBottom = "1px solid black";
-                                cell.appendChild(($t2=document.createElement('a'), $t2.innerHTML = gameObject.Name, $t2.href = "javascript:void(0)", $t2.onclick = function (v) {
+                                cell.appendChild(($t3=document.createElement('a'), $t3.innerHTML = gameObject.Name, $t3.href = "javascript:void(0)", $t3.onclick = function (v) {
                                     JoelFive.LevelEditor.App.Select(gameObject);
-                                }, $t2));
+                                }, $t3));
                                 cell.appendChild(document.createTextNode(" "));
-                                var cross = ($t3=document.createElement('a'), $t3.onclick = function (v) {
+                                var cross = ($t4=document.createElement('a'), $t4.onclick = function (v) {
                                     JoelFive.LevelEditor.App.Remove(gameObject);
-                                }, $t3.href = "javascript:void(0)", $t3);
-                                cross.appendChild(($t4 = JoelFive.LevelEditor.App.cross.cloneNode(), JoelFive.LevelEditor.App.cross = $t4, $t4));
+                                }, $t4.href = "javascript:void(0)", $t4);
+                                cross.appendChild(($t5 = JoelFive.LevelEditor.App.cross.cloneNode(), JoelFive.LevelEditor.App.cross = $t5, $t5));
                                 cell.appendChild(cross);
                                 cell.appendChild(document.createElement('br'));
                                 var text;
@@ -507,11 +512,11 @@ Bridge.assembly("JoelFive.LevelEditor", function ($asm, globals) {
                                 row.appendChild(cell);
                                 JoelFive.LevelEditor.App.table.appendChild(row);
                             }).call(this) || {};
-                            if($t1.jump == 1) continue;
+                            if($t2.jump == 1) continue;
                         }
                     }finally {
-                        if (Bridge.is($t, System.IDisposable)) {
-                            $t.System$IDisposable$dispose();
+                        if (Bridge.is($t1, System.IDisposable)) {
+                            $t1.System$IDisposable$dispose();
                         }
                     }JoelFive.LevelEditor.App.game.Draw();
                 },
@@ -533,7 +538,10 @@ Bridge.assembly("JoelFive.LevelEditor", function ($asm, globals) {
     Bridge.apply($asm.$.JoelFive.LevelEditor.App, {
         f1: function (e) {
         JoelFive.LevelEditor.App.Save();
-    }
+    },
+        f2: function (e) {
+            JoelFive.LevelEditor.App.Select(null);
+        }
     });
 
     Bridge.define("JoelFive.Movement", {

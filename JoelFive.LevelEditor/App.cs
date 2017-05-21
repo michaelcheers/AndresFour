@@ -91,6 +91,16 @@ namespace JoelFive.LevelEditor
         public static void Reload ()
         {
             table.InnerHTML = "";
+            var row1 = new HTMLTableRowElement();
+            table.AppendChild(row1);
+            var cell1 = new HTMLTableDataCellElement();
+            cell1.AppendChild(new HTMLAnchorElement
+            {
+                Href = "javascript:void(0)",
+                OnClick = e => Select(null),
+                InnerHTML = "Unselect"
+            });
+            row1.AppendChild(cell1);
             foreach (var gameObject in game.Children)
             {
                 if (string.IsNullOrEmpty(gameObject.Name))
