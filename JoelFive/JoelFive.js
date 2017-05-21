@@ -241,6 +241,9 @@ Bridge.assembly("JoelFive", function ($asm, globals) {
             Save: function (dynamic) {
                 dynamic.name = this.Name;
             },
+            AddKeys: function (addTo) {
+                addTo.add("Name", "Name");
+            },
             toDynamic: function () {
                 var result = {  };
                 var type;

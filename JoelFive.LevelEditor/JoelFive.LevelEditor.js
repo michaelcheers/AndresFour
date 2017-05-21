@@ -132,6 +132,9 @@ Bridge.assembly("JoelFive.LevelEditor", function ($asm, globals) {
             Save: function (dynamic) {
                 dynamic.name = this.Name;
             },
+            AddKeys: function (addTo) {
+                addTo.add("Name", "Name");
+            },
             toDynamic: function () {
                 var result = {  };
                 var type;
@@ -310,6 +313,8 @@ Bridge.assembly("JoelFive.LevelEditor", function ($asm, globals) {
                 $taskResult1, 
                 $task2, 
                 $taskResult2, 
+                $task3, 
+                $taskResult3, 
                 $jumpFromFinally, 
                 start, 
                 input, 
@@ -317,6 +322,7 @@ Bridge.assembly("JoelFive.LevelEditor", function ($asm, globals) {
                 $t, 
                 task, 
                 parseString, 
+                jsonObject, 
                 $t1, 
                 $t2, 
                 $t3, 
@@ -324,9 +330,19 @@ Bridge.assembly("JoelFive.LevelEditor", function ($asm, globals) {
                 $t4, 
                 $asyncBody = Bridge.fn.bind(this, function () {
                     for (;;) {
-                        $step = System.Array.min([0,1,2], $step);
+                        $step = System.Array.min([0,1,2,3], $step);
                         switch ($step) {
                             case 0: {
+                                $task2 = JoelFive.BridgeEssentials.LoadImage("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkCAYAAABw4pVUAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAABmJLR0QA/wD/AP+gvaeTAAAAB3RJTUUH4QUVEx4JDRbQCAAAAzNJREFUeNrt3cFt4zAQBdCfxRbhdBHAhcSXACnDZaSCPfsYIAWkigBpYS/BAt4euAdJgOLVSCNyKJGc/wHdbIrzH2I7sBIBDMMwDMMwjH3uNA8KKU92mJS+Zh8TUhdwmNTOfirPcwDwDOABwB8AbwA+hg0QpcsNxhHAE7ruPgG8ousufvH+OATgPQBhdPwOwOPoMe4Tvh+PfUfjzt77LuP6Gi1+vll4OL4CcCLKfxinvpupzs4WIBdhcaJgFUbou5zt6YfinHOve/cAfgE4jTfoJTeznvou7meeYvIecpx4PXT/k7LyJ2N43z1avGQNb1JLJ3SDEoHxZfIhiCiLnWyHIWzANcruGMJGXKIUgyFsyBVKcRjCxlygFIshbLBplOIxhI02iVINhrDhplCqwxA23gRKtRjCAFWjVI8hDFIlSjMYwkBVoTSHIQxWBUqzGMKARaM0jyEMWiSKGwxh4KJQ3GEIgxeB4hZDKGBXFPcYQhG7oBBjvpBNUYihK2YTFGKsKygrCjHiisqCQoyVyYlCjMjkQCFGYixRiGEUCxRiGMcQhRhWMUAhhnUSUIiRKxEof/uDGLkSgUKM3DFCIYZlElGIkSMTH2uvCoxrKOQyozXR/BVuiUn+tyFMZCJ+6cvyJReDZAyiWMYIgygWicC4Kt7oiRKTCIzho22Wbx5dJwGjiOu+mooBBlGsYohBlNRYYAhrEWVtLDGENYmiTQ4MYW2iLCUnhnAOoiiLyvq1K1HWFbTJd+BE0RWz6QUJRJkvZJerQ4gyXcSul+q4RykJQ9iTH5QSMYS9tY9SMoawx3ZRasAQ9toeSk0Ywp7bQakRQ9h7/Sg1Ywgz1IvSAoYwS30oLWEIM9WD0iKGMFv5KC1jCDOWi+IBQ5i1PBRPGMLM5aB4xBBm3x/FM4bQwX4oxBC72B6FGIudbIdCDHU326CMnqy9saQLjIl+tChmN5Z8IcZiR1qUFwuQCzFUPWlQLhYgZ2Kou1pCOVuA8Ab3ikygRN3g/m7pJH0OAJ4BPKC7BfUbgA/VIo5yU/QRwBO67j4BvKK/ffdcX1qQuAUcJrUzVZ8h5ckOw74YhmEYhmFKyz+CH5J6R0WlaQAAACV0RVh0ZGF0ZTpjcmVhdGUAMjAxNy0wNS0yMVQxOTozMDowOSswMDowME2eJS8AAAAldEVYdGRhdGU6bW9kaWZ5ADIwMTctMDUtMjFUMTk6MzA6MDkrMDA6MDA8w52TAAAAAElFTkSuQmCC");
+                                $step = 1;
+                                $task2.continueWith($asyncBody, true);
+                                return;
+                            }
+                            case 1: {
+                                $taskResult2 = $task2.getAwaitedResult();
+                                JoelFive.LevelEditor.App.cross = $taskResult2;
+                                JoelFive.LevelEditor.App.cross.width = 10;
+                                JoelFive.LevelEditor.App.cross.height = 10;
                                 start = document.createElement('div');
                                 input = document.createElement('input');
                                 file = ($t=document.createElement('input'), $t.type = "file", $t);
@@ -370,22 +386,24 @@ Bridge.assembly("JoelFive.LevelEditor", function ($asm, globals) {
                                     $asyncBody();
                                 };
                                 $task1 = task.task;
-                                $step = 1;
+                                $step = 2;
                                 $task1.continueWith($asyncBody, true);
                                 return;
                             }
-                            case 1: {
+                            case 2: {
                                 $taskResult1 = $task1.getAwaitedResult();
                                 parseString = Bridge.global.atob($taskResult1);
+                                jsonObject = JSON.parse(parseString);
+                                JoelFive.LevelEditor.App.creation = jsonObject;
                                 start.style.display = "none";
-                                $task2 = JoelFive.Game.Create(JSON.parse(parseString));
-                                $step = 2;
-                                $task2.continueWith($asyncBody, true);
+                                $task3 = JoelFive.Game.Create(jsonObject);
+                                $step = 3;
+                                $task3.continueWith($asyncBody, true);
                                 return;
                             }
-                            case 2: {
-                                $taskResult2 = $task2.getAwaitedResult();
-                                JoelFive.LevelEditor.App.game = $taskResult2;
+                            case 3: {
+                                $taskResult3 = $task3.getAwaitedResult();
+                                JoelFive.LevelEditor.App.game = $taskResult3;
                                 JoelFive.LevelEditor.App.game.Canvas.style.border = "1px solid black";
                                 document.body.appendChild(($t1 = document.createElement('div'), JoelFive.LevelEditor.App.left = $t1, $t1));
                                 document.body.appendChild(($t2 = document.createElement('div'), JoelFive.LevelEditor.App.right = $t2, $t2));
@@ -418,12 +436,16 @@ Bridge.assembly("JoelFive.LevelEditor", function ($asm, globals) {
                 left: null,
                 right: null,
                 table: null,
-                selected: null
+                creation: null,
+                selected: null,
+                cross: null
             },
             methods: {
                 Save: function () {
                     var $t;
-                    var download = ($t=document.createElement('a'), $t.download = "level.dat", $t.href = System.String.format("data:text/plain;charset=UTF-8,{0}", Bridge.global.btoa(JSON.stringify(JoelFive.LevelEditor.App.game.toDynamic()))), $t);
+                    var dynamicVal = JoelFive.LevelEditor.App.game.toDynamic();
+                    dynamicVal.recovery = JoelFive.LevelEditor.App.creation;
+                    var download = ($t=document.createElement('a'), $t.download = "level.dat", $t.href = System.String.format("data:text/plain;charset=UTF-8,{0}", Bridge.global.btoa(JSON.stringify(dynamicVal))), $t);
                     download.click();
                 },
                 FileRead: function (fileInput) {
@@ -436,8 +458,14 @@ Bridge.assembly("JoelFive.LevelEditor", function ($asm, globals) {
                     fileReader.readAsText(file);
                     return task.task;
                 },
+                Remove: function (gameObject) {
+                    if (!JoelFive.LevelEditor.App.game.Children.remove(gameObject)) {
+                        throw new System.Exception();
+                    }
+                    JoelFive.LevelEditor.App.Reload();
+                },
                 Reload: function () {
-                    var $t, $t1, $t2;
+                    var $t, $t1, $t2, $t3, $t4;
                     JoelFive.LevelEditor.App.table.innerHTML = "";
                     $t = Bridge.getEnumerator(JoelFive.LevelEditor.App.game.Children);
                     try {
@@ -449,9 +477,16 @@ Bridge.assembly("JoelFive.LevelEditor", function ($asm, globals) {
                                 }
                                 var row = document.createElement('tr');
                                 var cell = document.createElement('td');
+                                cell.style.borderBottom = "1px solid black";
                                 cell.appendChild(($t2=document.createElement('a'), $t2.innerHTML = gameObject.Name, $t2.href = "javascript:void(0)", $t2.onclick = function (v) {
                                     JoelFive.LevelEditor.App.Select(gameObject);
                                 }, $t2));
+                                cell.appendChild(document.createTextNode(" "));
+                                var cross = ($t3=document.createElement('a'), $t3.onclick = function (v) {
+                                    JoelFive.LevelEditor.App.Remove(gameObject);
+                                }, $t3.href = "javascript:void(0)", $t3);
+                                cross.appendChild(($t4 = JoelFive.LevelEditor.App.cross.cloneNode(), JoelFive.LevelEditor.App.cross = $t4, $t4));
+                                cell.appendChild(cross);
                                 cell.appendChild(document.createElement('br'));
                                 var text;
                                 if (Bridge.is(gameObject, JoelFive.Character)) {
@@ -467,7 +502,8 @@ Bridge.assembly("JoelFive.LevelEditor", function ($asm, globals) {
                                         }
                                     }
                                 }
-                                cell.appendChild(document.createTextNode(text));
+                                cell.appendChild(document.createTextNode(System.String.format("Type: {0}", text)));
+
                                 row.appendChild(cell);
                                 JoelFive.LevelEditor.App.table.appendChild(row);
                             }).call(this) || {};

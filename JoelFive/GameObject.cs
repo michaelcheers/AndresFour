@@ -14,6 +14,10 @@ namespace JoelFive
         {
             @dynamic.name = Name;
         }
+        public virtual void AddKeys (Dictionary<string, string> addTo)
+        {
+            addTo.Add("Name", "Name");
+        }
         public override dynamic ToDynamic ()
         {
             dynamic result = new object();
