@@ -64,6 +64,7 @@
       <Link>Vector2.cs</Link>
     </Compile>
     <Compile Include="App.cs" />
+    <Compile Include="LevelEditorReference.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

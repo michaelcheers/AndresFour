@@ -404,6 +404,7 @@ Bridge.assembly("JoelFive.LevelEditor", function ($asm, globals) {
                             case 3: {
                                 $taskResult3 = $task3.getAwaitedResult();
                                 JoelFive.LevelEditor.App.game = $taskResult3;
+                                JoelFive.LevelEditor.App.game.Canvas.onclick = JoelFive.LevelEditor.App.Click;
                                 JoelFive.LevelEditor.App.game.Canvas.style.border = "1px solid black";
                                 document.body.appendChild(($t1 = document.createElement('div'), JoelFive.LevelEditor.App.left = $t1, $t1));
                                 document.body.appendChild(($t2 = document.createElement('div'), JoelFive.LevelEditor.App.right = $t2, $t2));
@@ -418,7 +419,7 @@ Bridge.assembly("JoelFive.LevelEditor", function ($asm, globals) {
                                 button.style.bottom = "0";
                                 button.style.left = "0";
                                 document.body.appendChild(button);
-                                JoelFive.LevelEditor.App.Reload();
+                                JoelFive.LevelEditor.App.Refresh();
                                 return;
                             }
                             default: {
@@ -437,8 +438,15 @@ Bridge.assembly("JoelFive.LevelEditor", function ($asm, globals) {
                 right: null,
                 table: null,
                 creation: null,
+                allowed: null,
+                mouseDownEvent: null,
                 selected: null,
                 cross: null
+            },
+            ctors: {
+                init: function () {
+                    this.allowed = System.Array.init([System.String, System.Double], Function);
+                }
             },
             methods: {
                 Save: function () {
@@ -462,61 +470,291 @@ Bridge.assembly("JoelFive.LevelEditor", function ($asm, globals) {
                     if (!JoelFive.LevelEditor.App.game.Children.remove(gameObject)) {
                         throw new System.Exception();
                     }
-                    JoelFive.LevelEditor.App.Reload();
+                    JoelFive.LevelEditor.App.Refresh();
                 },
-                Reload: function () {
-                    var $t, $t1, $t2, $t3, $t4, $t5;
-                    JoelFive.LevelEditor.App.table.innerHTML = "";
+                CreateCell: function (table, toAppend) {
+                    var $t;
+                    if (toAppend === void 0) { toAppend = []; }
                     var row1 = document.createElement('tr');
-                    JoelFive.LevelEditor.App.table.appendChild(row1);
+                    table.appendChild(row1);
                     var cell1 = document.createElement('td');
-                    cell1.appendChild(($t=document.createElement('a'), $t.href = "javascript:void(0)", $t.onclick = $asm.$.JoelFive.LevelEditor.App.f2, $t.innerHTML = "Unselect", $t));
-                    row1.appendChild(cell1);
-                    $t1 = Bridge.getEnumerator(JoelFive.LevelEditor.App.game.Children);
+                    $t = Bridge.getEnumerator(toAppend);
                     try {
-                        while ($t1.moveNext()) {
-                            $t2 = (function () {
-                                var gameObject = $t1.Current;
+                        while ($t.moveNext()) {
+                            var append = $t.Current;
+                            cell1.appendChild(append);
+                        }
+                    }finally {
+                        if (Bridge.is($t, System.IDisposable)) {
+                            $t.System$IDisposable$dispose();
+                        }
+                    }row1.appendChild(cell1);
+                },
+                CreateReference: function (gameObject, outTable) {
+                    var $t, $t1, $t2, $t3, $t4, $t5, $t6;
+                    var result = ($t=new JoelFive.LevelEditor.LevelEditorReference(), $t.gameObject = gameObject, $t.cells = new (System.Collections.Generic.Dictionary$2(System.String,HTMLElement))(), $t.members = new (System.Collections.Generic.Dictionary$2(System.String,System.Object))(), $t);
+                    var type;
+                    if (Bridge.is(gameObject, JoelFive.Character)) {
+                        type = "Character";
+                    } else {
+                        if (Bridge.is(gameObject, JoelFive.RealGameObject)) {
+                            type = "Real Thing";
+                        } else {
+                            if (Bridge.is(gameObject, JoelFive.DrawnGameObject)) {
+                                type = "Illusion";
+                            } else {
+                                throw new System.Exception(System.String.format("Type not allowed: {0}", Bridge.Reflection.getTypeFullName(Bridge.getType(gameObject))));
+                            }
+                        }
+                    }
+                    var table = document.createElement('table');
+                    var row = document.createElement('tr');
+                    var cell = ($t1=document.createElement('td'), $t1.innerHTML = "Type", $t1);
+                    var cell2 = ($t2=document.createElement('td'), $t2.innerHTML = type, $t2);
+                    result.cells.add("Type", cell2);
+                    row.appendChild(cell);
+                    row.appendChild(cell2);
+                    table.appendChild(row);
+                    var fields = new (System.Collections.Generic.List$1(System.Object))(Bridge.Reflection.getMembers(Bridge.getType(gameObject), 4, 28));
+                    fields.addRange(Bridge.Reflection.getMembers(Bridge.getType(gameObject), 16, 28));
+                    $t3 = Bridge.getEnumerator(fields);
+                    try {
+                        while ($t3.moveNext()) {
+                            var field = $t3.Current;
+                            if ((field.is || false)) {
+                                continue;
+                            }
+                            var memberType;
+                            if (Bridge.is(field, System.Reflection.FieldInfo)) {
+                                memberType = Bridge.cast(field, System.Reflection.FieldInfo).rt;
+                            } else {
+                                if (Bridge.is(field, System.Reflection.PropertyInfo)) {
+                                    memberType = Bridge.cast(field, System.Reflection.PropertyInfo).rt;
+                                } else {
+                                    throw new System.Exception();
+                                }
+                            }
+                            if (System.Array.contains(JoelFive.LevelEditor.App.allowed, memberType, Function)) {
+                                var value;
+                                if (Bridge.is(field, System.Reflection.FieldInfo)) {
+                                    value = Bridge.Reflection.fieldAccess(Bridge.cast(field, System.Reflection.FieldInfo), gameObject);
+                                } else {
+                                    if (Bridge.is(field, System.Reflection.PropertyInfo)) {
+                                        value = Bridge.Reflection.midel(Bridge.cast(field, System.Reflection.PropertyInfo).g, gameObject)();
+                                    } else {
+                                        throw new System.Exception();
+                                    }
+                                }
+                                row = document.createElement('tr');
+                                var valueString;
+                                if (Bridge.is(value, System.String)) {
+                                    valueString = Bridge.cast(value, System.String);
+                                } else {
+                                    if (Bridge.is(value, System.Double)) {
+                                        valueString = System.Double.format(System.Nullable.getValue(Bridge.cast(Bridge.unbox(value), System.Double)), 'G');
+                                    } else {
+                                        throw new System.Exception();
+                                    }
+                                }
+                                cell = ($t4=document.createElement('td'), $t4.innerHTML = field.n, $t4);
+                                cell2 = ($t5=document.createElement('td'), $t5.contentEditable = "true", $t5.innerHTML = valueString, $t5);
+                                result.cells.add(field.n, cell2);
+                                result.members.add(field.n, field);
+                                row.appendChild(cell);
+                                row.appendChild(cell2);
+                                table.appendChild(row);
+                            }
+                        }
+                    }finally {
+                        if (Bridge.is($t3, System.IDisposable)) {
+                            $t3.System$IDisposable$dispose();
+                        }
+                    }row = document.createElement('tr');
+                    cell = document.createElement('td');
+                    cell.appendChild(($t6=document.createElement('button'), $t6.innerHTML = "Save Changes", $t6.onclick = function (e) {
+                        JoelFive.LevelEditor.App.SaveChanges(result);
+                    }, $t6));
+                    row.appendChild(cell);
+                    table.appendChild(row);
+                    outTable.v = table;
+                    return result;
+                },
+                SaveChanges: function (reference) {
+                    var $t;
+                    $t = Bridge.getEnumerator(reference.cells);
+                    try {
+                        while ($t.moveNext()) {
+                            var cell = $t.Current;
+                            if (Bridge.referenceEquals(cell.key, "Type")) {
+                                continue;
+                            }
+                            var memberInfo = reference.members.get(cell.key);
+                            var value;
+                            if (Bridge.is(memberInfo, System.Reflection.FieldInfo)) {
+                                value = Bridge.cast(memberInfo, System.Reflection.FieldInfo).rt;
+                            } else {
+                                if (Bridge.is(memberInfo, System.Reflection.PropertyInfo)) {
+                                    value = Bridge.cast(memberInfo, System.Reflection.PropertyInfo).rt;
+                                } else {
+                                    throw new System.Exception();
+                                }
+                            }
+                            var toWriteValue;
+                            if (Bridge.referenceEquals(value, System.String)) {
+                                toWriteValue = cell.value.innerHTML;
+                            } else {
+                                if (Bridge.referenceEquals(value, System.Double)) {
+                                    toWriteValue = Bridge.box(System.Double.parse(cell.value.innerHTML), System.Double, $box_.System.Double.toString);
+                                } else {
+                                    throw new System.Exception();
+                                }
+                            }
+                            if (Bridge.is(memberInfo, System.Reflection.FieldInfo)) {
+                                Bridge.Reflection.fieldAccess(Bridge.cast(memberInfo, System.Reflection.FieldInfo), reference.gameObject, Bridge.unbox(toWriteValue));
+                            } else {
+                                Bridge.Reflection.midel(Bridge.cast(memberInfo, System.Reflection.PropertyInfo).s, reference.gameObject)(Bridge.unbox(toWriteValue));
+                            }
+                        }
+                    }finally {
+                        if (Bridge.is($t, System.IDisposable)) {
+                            $t.System$IDisposable$dispose();
+                        }
+                    }JoelFive.LevelEditor.App.Refresh();
+                },
+                Click: function (mouseEvent) {
+                    var $t;
+                    JoelFive.LevelEditor.App.mouseDownEvent != null ? JoelFive.LevelEditor.App.mouseDownEvent.setResult(($t=new JoelFive.Vector2(), $t.X = mouseEvent.layerX, $t.Y = mouseEvent.layerY, $t)) : null;
+                },
+                WaitForClick: function () {
+                    var $step = 0,
+                        $task1, 
+                        $taskResult1, 
+                        $jumpFromFinally, 
+                        $tcs = new System.Threading.Tasks.TaskCompletionSource(), 
+                        $returnValue, 
+                        result, 
+                        $async_e, 
+                        $asyncBody = Bridge.fn.bind(this, function () {
+                            try {
+                                for (;;) {
+                                    $step = System.Array.min([0,1], $step);
+                                    switch ($step) {
+                                        case 0: {
+                                            JoelFive.LevelEditor.App.mouseDownEvent = new System.Threading.Tasks.TaskCompletionSource();
+                                            $task1 = JoelFive.LevelEditor.App.mouseDownEvent.task;
+                                            $step = 1;
+                                            $task1.continueWith($asyncBody);
+                                            return;
+                                        }
+                                        case 1: {
+                                            $taskResult1 = $task1.getAwaitedResult();
+                                            result = $taskResult1;
+                                            JoelFive.LevelEditor.App.mouseDownEvent = null;
+                                            $tcs.setResult(result.$clone());
+                                            return;
+                                        }
+                                        default: {
+                                            $tcs.setResult(null);
+                                            return;
+                                        }
+                                    }
+                                }
+                            } catch($async_e1) {
+                                $async_e = System.Exception.create($async_e1);
+                                $tcs.setException($async_e);
+                            }
+                        }, arguments);
+
+                    $asyncBody();
+                    return $tcs.task;
+                },
+                CreateRectangle: function () {
+                    var $step = 0,
+                        $task1, 
+                        $taskResult1, 
+                        $task2, 
+                        $taskResult2, 
+                        $jumpFromFinally, 
+                        a, 
+                        b, 
+                        rect, 
+                        $t, 
+                        created, 
+                        $t1, 
+                        $asyncBody = Bridge.fn.bind(this, function () {
+                            for (;;) {
+                                $step = System.Array.min([0,1,2], $step);
+                                switch ($step) {
+                                    case 0: {
+                                        $task1 = JoelFive.LevelEditor.App.WaitForClick();
+                                        $step = 1;
+                                        $task1.continueWith($asyncBody, true);
+                                        return;
+                                    }
+                                    case 1: {
+                                        $taskResult1 = $task1.getAwaitedResult();
+                                        a = $taskResult1;
+                                        $task2 = JoelFive.LevelEditor.App.WaitForClick();
+                                        $step = 2;
+                                        $task2.continueWith($asyncBody, true);
+                                        return;
+                                    }
+                                    case 2: {
+                                        $taskResult2 = $task2.getAwaitedResult();
+                                        b = $taskResult2;
+                                        rect = ($t=new JoelFive.Rectangle(), $t.X = a.X, $t.Y = a.Y, $t.Width = b.X - a.X, $t.Height = b.Y - a.Y, $t);
+                                        created = ($t1=new JoelFive.RealGameObject(), $t1.Gravity = 0, $t1.Position = rect.$clone(), $t1.Image = "#ffffff", $t1.Name = "New Object", $t1);
+                                        JoelFive.LevelEditor.App.game.Children.add(created);
+                                        JoelFive.LevelEditor.App.Select(created);
+                                        JoelFive.LevelEditor.App.Refresh();
+                                        return;
+                                    }
+                                    default: {
+                                        return;
+                                    }
+                                }
+                            }
+                        }, arguments);
+
+                    $asyncBody();
+                },
+                Refresh: function () {
+                    var $t, $t1, $t2, $t3, $t4, $t5, $t6;
+                    JoelFive.LevelEditor.App.table.innerHTML = "";
+                    JoelFive.LevelEditor.App.CreateCell(JoelFive.LevelEditor.App.table, [($t=document.createElement('a'), $t.href = "javascript:void(0)", $t.innerHTML = "Create Rectangle", $t.onclick = $asm.$.JoelFive.LevelEditor.App.f2, $t)]);
+                    JoelFive.LevelEditor.App.CreateCell(JoelFive.LevelEditor.App.table, [($t1=document.createElement('a'), $t1.href = "javascript:void(0)", $t1.onclick = $asm.$.JoelFive.LevelEditor.App.f3, $t1.innerHTML = "Unselect", $t1)]);
+                    $t2 = Bridge.getEnumerator(JoelFive.LevelEditor.App.game.Children);
+                    try {
+                        while ($t2.moveNext()) {
+                            $t3 = (function () {
+                                var gameObject = $t2.Current;
                                 if (System.String.isNullOrEmpty(gameObject.Name)) {
                                     return {jump:1};
                                 }
                                 var row = document.createElement('tr');
                                 var cell = document.createElement('td');
                                 cell.style.borderBottom = "1px solid black";
-                                cell.appendChild(($t3=document.createElement('a'), $t3.innerHTML = gameObject.Name, $t3.href = "javascript:void(0)", $t3.onclick = function (v) {
+                                cell.appendChild(($t4=document.createElement('a'), $t4.innerHTML = gameObject.Name, $t4.href = "javascript:void(0)", $t4.onclick = function (v) {
                                     JoelFive.LevelEditor.App.Select(gameObject);
-                                }, $t3));
+                                }, $t4));
                                 cell.appendChild(document.createTextNode(" "));
-                                var cross = ($t4=document.createElement('a'), $t4.onclick = function (v) {
+                                var cross = ($t5=document.createElement('a'), $t5.onclick = function (v) {
                                     JoelFive.LevelEditor.App.Remove(gameObject);
-                                }, $t4.href = "javascript:void(0)", $t4);
-                                cross.appendChild(($t5 = JoelFive.LevelEditor.App.cross.cloneNode(), JoelFive.LevelEditor.App.cross = $t5, $t5));
+                                }, $t5.href = "javascript:void(0)", $t5);
+                                cross.appendChild(($t6 = JoelFive.LevelEditor.App.cross.cloneNode(), JoelFive.LevelEditor.App.cross = $t6, $t6));
                                 cell.appendChild(cross);
                                 cell.appendChild(document.createElement('br'));
-                                var text;
-                                if (Bridge.is(gameObject, JoelFive.Character)) {
-                                    text = "Character";
-                                } else {
-                                    if (Bridge.is(gameObject, JoelFive.RealGameObject)) {
-                                        text = "Real Thing";
-                                    } else {
-                                        if (Bridge.is(gameObject, JoelFive.DrawnGameObject)) {
-                                            text = "Illusion";
-                                        } else {
-                                            throw new System.Exception(System.String.format("Type not allowed: {0}", Bridge.Reflection.getTypeFullName(Bridge.getType(gameObject))));
-                                        }
-                                    }
-                                }
-                                cell.appendChild(document.createTextNode(System.String.format("Type: {0}", text)));
-
+                                var tableNested = { };
+                                var reference = JoelFive.LevelEditor.App.CreateReference(gameObject, tableNested);
+                                cell.appendChild(tableNested.v);
                                 row.appendChild(cell);
                                 JoelFive.LevelEditor.App.table.appendChild(row);
                             }).call(this) || {};
-                            if($t2.jump == 1) continue;
+                            if($t3.jump == 1) continue;
                         }
                     }finally {
-                        if (Bridge.is($t1, System.IDisposable)) {
-                            $t1.System$IDisposable$dispose();
+                        if (Bridge.is($t2, System.IDisposable)) {
+                            $t2.System$IDisposable$dispose();
                         }
                     }JoelFive.LevelEditor.App.game.Draw();
                 },
@@ -527,7 +765,7 @@ Bridge.assembly("JoelFive.LevelEditor", function ($asm, globals) {
                     if (Bridge.is(((JoelFive.LevelEditor.App.selected = gameObject, gameObject)), JoelFive.DrawnGameObject)) {
                         gameObject.Selected = true;
                     }
-                    JoelFive.LevelEditor.App.Reload();
+                    JoelFive.LevelEditor.App.Refresh();
                 }
             }
         }
@@ -540,7 +778,18 @@ Bridge.assembly("JoelFive.LevelEditor", function ($asm, globals) {
         JoelFive.LevelEditor.App.Save();
     },
         f2: function (e) {
+            JoelFive.LevelEditor.App.CreateRectangle();
+        },
+        f3: function (e) {
             JoelFive.LevelEditor.App.Select(null);
+        }
+    });
+
+    Bridge.define("JoelFive.LevelEditor.LevelEditorReference", {
+        fields: {
+            gameObject: null,
+            cells: null,
+            members: null
         }
     });
 
@@ -1097,4 +1346,26 @@ Bridge.assembly("JoelFive.LevelEditor", function ($asm, globals) {
             return { keys: v.Keys.toArray(), x: v.Velocity.X, y: v.Velocity.Y };
         }
     });
+
+    var $box_ = {};
+
+    Bridge.ns("System.Double", $box_);
+
+    Bridge.apply($box_.System.Double, {
+        toString: function (obj) {return System.Double.format(obj, 'G');}
+    });
+
+    var $m = Bridge.setMetadata,
+        $n = [System,System.Threading.Tasks,JoelFive,System.Collections.Generic,JoelFive.LevelEditor];
+    $m($n[2].BridgeEssentials, function () { return {"att":1048961,"a":2,"s":true,"m":[{"a":2,"n":"LoadImage","is":true,"t":8,"pi":[{"n":"value","pt":$n[0].String,"ps":0}],"sn":"LoadImage","rt":$n[1].Task$1,"p":[$n[0].String]}]}; });
+    $m($n[2].Character, function () { return {"att":1048577,"a":2,"m":[{"a":2,"isSynthetic":true,"n":".ctor","t":1,"sn":"ctor"},{"ov":true,"a":2,"n":"Parse","t":8,"pi":[{"n":"dynamic","pt":System.Object,"ps":0}],"sn":"Parse","rt":$n[1].Task,"p":[System.Object]},{"ov":true,"a":2,"n":"Save","t":8,"pi":[{"n":"dynamic","pt":System.Object,"ps":0}],"sn":"Save","rt":$n[0].Object,"p":[System.Object]},{"ov":true,"a":2,"n":"Update","t":8,"pi":[{"n":"in","pt":$n[2].Game,"ps":0}],"sn":"Update","rt":$n[0].Object,"p":[$n[2].Game]},{"a":2,"n":"Type","is":true,"t":4,"rt":$n[0].String,"sn":"Type"},{"a":2,"n":"movements","t":4,"rt":$n[3].List$1(JoelFive.Movement),"sn":"movements"}]}; });
+    $m($n[2].DrawnGameObject, function () { return {"att":1048577,"a":2,"m":[{"a":2,"isSynthetic":true,"n":".ctor","t":1,"sn":"ctor"},{"v":true,"a":2,"n":"Parse","t":8,"pi":[{"n":"dynamic","pt":System.Object,"ps":0}],"sn":"Parse","rt":$n[1].Task,"p":[System.Object]},{"ov":true,"a":2,"n":"Save","t":8,"pi":[{"n":"dynamic","pt":System.Object,"ps":0}],"sn":"Save","rt":$n[0].Object,"p":[System.Object]},{"a":2,"n":"Height","t":16,"rt":$n[0].Double,"g":{"a":2,"n":"get_Height","t":8,"rt":$n[0].Double,"fg":"Height"},"s":{"a":2,"n":"set_Height","t":8,"p":[$n[0].Double],"rt":$n[0].Object,"fs":"Height"},"fn":"Height"},{"a":2,"n":"Width","t":16,"rt":$n[0].Double,"g":{"a":2,"n":"get_Width","t":8,"rt":$n[0].Double,"fg":"Width"},"s":{"a":2,"n":"set_Width","t":8,"p":[$n[0].Double],"rt":$n[0].Object,"fs":"Width"},"fn":"Width"},{"a":2,"n":"X","t":16,"rt":$n[0].Double,"g":{"a":2,"n":"get_X","t":8,"rt":$n[0].Double,"fg":"X"},"s":{"a":2,"n":"set_X","t":8,"p":[$n[0].Double],"rt":$n[0].Object,"fs":"X"},"fn":"X"},{"a":2,"n":"Y","t":16,"rt":$n[0].Double,"g":{"a":2,"n":"get_Y","t":8,"rt":$n[0].Double,"fg":"Y"},"s":{"a":2,"n":"set_Y","t":8,"p":[$n[0].Double],"rt":$n[0].Object,"fs":"Y"},"fn":"Y"},{"a":2,"n":"Image","t":4,"rt":System.Object,"sn":"Image"},{"a":2,"n":"Position","t":4,"rt":$n[2].Rectangle,"sn":"Position"},{"a":4,"n":"Selected","t":4,"rt":$n[0].Boolean,"sn":"Selected"},{"a":2,"n":"Type","is":true,"t":4,"rt":$n[0].String,"sn":"Type"}]}; });
+    $m($n[2].Game, function () { return {"att":1048577,"a":2,"m":[{"a":2,"isSynthetic":true,"n":".ctor","t":1,"sn":"ctor"},{"a":2,"n":"Create","is":true,"t":8,"pi":[{"n":"dynamic","pt":System.Object,"ps":0}],"sn":"Create","rt":$n[1].Task$1,"p":[System.Object]},{"a":2,"n":"Draw","t":8,"sn":"Draw","rt":$n[0].Object},{"a":2,"n":"Start","t":8,"sn":"Start","rt":$n[0].Object},{"ov":true,"a":2,"n":"ToDynamic","t":8,"sn":"toDynamic","rt":System.Object},{"a":2,"n":"Update","t":8,"sn":"Update","rt":$n[0].Object},{"a":2,"n":"Canvas","t":4,"rt":HTMLCanvasElement,"sn":"Canvas"},{"a":2,"n":"Children","t":4,"rt":$n[3].List$1(JoelFive.GameObject),"sn":"Children"},{"a":2,"n":"Down","t":4,"rt":$n[3].HashSet$1(System.Int32),"sn":"Down"},{"a":2,"n":"DrawInterval","t":4,"rt":$n[0].Int32,"sn":"DrawInterval"},{"a":2,"n":"Interval","t":4,"rt":$n[0].Int32,"sn":"Interval"}]}; });
+    $m($n[2].GameObject, function () { return {"att":1048705,"a":2,"m":[{"a":3,"isSynthetic":true,"n":".ctor","t":1,"sn":"ctor"},{"v":true,"a":2,"n":"AddKeys","t":8,"pi":[{"n":"addTo","pt":$n[3].Dictionary$2(System.String,System.String),"ps":0}],"sn":"AddKeys","rt":$n[0].Object,"p":[$n[3].Dictionary$2(System.String,System.String)]},{"a":2,"n":"Create","is":true,"t":8,"pi":[{"n":"dynamic","pt":System.Object,"ps":0}],"sn":"Create","rt":$n[1].Task$1,"p":[System.Object]},{"v":true,"a":2,"n":"Save","t":8,"pi":[{"n":"dynamic","pt":System.Object,"ps":0}],"sn":"Save","rt":$n[0].Object,"p":[System.Object]},{"ov":true,"a":2,"n":"ToDynamic","t":8,"sn":"toDynamic","rt":System.Object},{"a":2,"n":"Name","t":4,"rt":$n[0].String,"sn":"Name"}]}; });
+    $m($n[2].Movement, function () { return {"att":1048577,"a":2,"m":[{"a":2,"isSynthetic":true,"n":".ctor","t":1,"sn":"ctor"},{"a":2,"n":"Keys","t":4,"rt":$n[3].List$1(System.Int32),"sn":"Keys"},{"a":2,"n":"Velocity","t":4,"rt":$n[2].Vector2,"sn":"Velocity"}]}; });
+    $m($n[2].RealGameObject, function () { return {"att":1048577,"a":2,"m":[{"a":2,"isSynthetic":true,"n":".ctor","t":1,"sn":"ctor"},{"ov":true,"a":2,"n":"Parse","t":8,"pi":[{"n":"dynamic","pt":System.Object,"ps":0}],"sn":"Parse","rt":$n[1].Task,"p":[System.Object]},{"ov":true,"a":2,"n":"Save","t":8,"pi":[{"n":"dynamic","pt":System.Object,"ps":0}],"sn":"Save","rt":$n[0].Object,"p":[System.Object]},{"a":2,"n":"TryMove","t":8,"pi":[{"n":"in","pt":$n[2].Game,"ps":0},{"n":"velocity","pt":$n[2].Vector2,"ps":1}],"sn":"TryMove","rt":$n[0].Boolean,"p":[$n[2].Game,$n[2].Vector2]},{"a":2,"n":"TryMove","t":8,"pi":[{"n":"in","pt":$n[2].Game,"ps":0},{"n":"NotMovingIn","pt":$n[0].Double,"ps":1},{"n":"MovingIn","ref":true,"pt":$n[0].Double,"ps":2},{"n":"NotMovingInLength","pt":$n[0].Double,"ps":3},{"n":"MovingInLength","pt":$n[0].Double,"ps":4},{"n":"Velocity","pt":$n[0].Double,"ps":5},{"n":"GetMovingIn","pt":Function,"ps":6},{"n":"GetMovingInLength","pt":Function,"ps":7}],"sn":"TryMove$1","rt":$n[0].Boolean,"p":[$n[2].Game,$n[0].Double,$n[0].Double,$n[0].Double,$n[0].Double,$n[0].Double,Function,Function]},{"a":2,"n":"TryMoveNegative","t":8,"pi":[{"n":"in","pt":$n[2].Game,"ps":0},{"n":"NotMovingIn","pt":$n[0].Double,"ps":1},{"n":"MovingIn","ref":true,"pt":$n[0].Double,"ps":2},{"n":"NotMovingInLength","pt":$n[0].Double,"ps":3},{"n":"MovingInLength","pt":$n[0].Double,"ps":4},{"n":"Velocity","pt":$n[0].Double,"ps":5},{"n":"GetMovingIn","pt":Function,"ps":6},{"n":"GetMovingInLength","pt":Function,"ps":7}],"sn":"TryMoveNegative","rt":$n[0].Boolean,"p":[$n[2].Game,$n[0].Double,$n[0].Double,$n[0].Double,$n[0].Double,$n[0].Double,Function,Function]},{"v":true,"a":2,"n":"Update","t":8,"pi":[{"n":"in","pt":$n[2].Game,"ps":0}],"sn":"Update","rt":$n[0].Object,"p":[$n[2].Game]},{"a":2,"n":"Gravity","t":4,"rt":$n[0].Double,"sn":"Gravity"},{"a":2,"n":"Type","is":true,"t":4,"rt":$n[0].String,"sn":"Type"},{"a":4,"n":"onSolid","t":4,"rt":$n[0].Boolean,"sn":"onSolid"}]}; });
+    $m($n[2].Rectangle, function () { return {"att":1048841,"a":2,"m":[{"a":2,"isSynthetic":true,"n":".ctor","t":1,"sn":"ctor"},{"a":2,"n":"Intersects","t":8,"pi":[{"n":"value","pt":$n[2].Rectangle,"ps":0}],"sn":"Intersects","rt":$n[0].Boolean,"p":[$n[2].Rectangle]},{"a":2,"n":"Height","t":16,"rt":$n[0].Double,"g":{"a":2,"n":"get_Height","t":8,"rt":$n[0].Double,"fg":"Height"},"s":{"a":2,"n":"set_Height","t":8,"p":[$n[0].Double],"rt":$n[0].Object,"fs":"Height"},"fn":"Height"},{"a":2,"n":"Width","t":16,"rt":$n[0].Double,"g":{"a":2,"n":"get_Width","t":8,"rt":$n[0].Double,"fg":"Width"},"s":{"a":2,"n":"set_Width","t":8,"p":[$n[0].Double],"rt":$n[0].Object,"fs":"Width"},"fn":"Width"},{"a":2,"n":"X","t":4,"rt":$n[0].Double,"sn":"X"},{"a":2,"n":"Y","t":4,"rt":$n[0].Double,"sn":"Y"},{"a":1,"n":"_height","t":4,"rt":$n[0].Double,"sn":"_height"},{"a":1,"n":"_width","t":4,"rt":$n[0].Double,"sn":"_width"}]}; });
+    $m($n[2].Vector2, function () { return {"att":1048841,"a":2,"m":[{"a":2,"isSynthetic":true,"n":".ctor","t":1,"sn":"ctor"},{"a":2,"n":"X","t":4,"rt":$n[0].Double,"sn":"X"},{"a":2,"n":"Y","t":4,"rt":$n[0].Double,"sn":"Y"}]}; });
+    $m($n[4].App, function () { return {"att":1048961,"a":2,"s":true,"m":[{"a":2,"n":"Click","is":true,"t":8,"pi":[{"n":"mouseEvent","pt":MouseEvent(HTMLCanvasElement),"ps":0}],"sn":"Click","rt":$n[0].Object,"p":[MouseEvent(HTMLCanvasElement)]},{"a":2,"n":"CreateCell","is":true,"t":8,"pi":[{"n":"table","pt":HTMLTableElement,"ps":0},{"n":"toAppend","ip":true,"pt":System.Array.type(Node),"ps":1}],"sn":"CreateCell","rt":$n[0].Object,"p":[HTMLTableElement,System.Array.type(Node)]},{"a":2,"n":"CreateRectangle","is":true,"t":8,"sn":"CreateRectangle","rt":$n[0].Object},{"a":2,"n":"CreateReference","is":true,"t":8,"pi":[{"n":"gameObject","pt":$n[2].GameObject,"ps":0},{"n":"outTable","out":true,"pt":HTMLTableElement,"ps":1}],"sn":"CreateReference","rt":$n[4].LevelEditorReference,"p":[$n[2].GameObject,HTMLTableElement]},{"a":1,"n":"FileRead","is":true,"t":8,"pi":[{"n":"fileInput","pt":HTMLInputElement,"ps":0}],"sn":"FileRead","rt":$n[1].Task$1,"p":[HTMLInputElement]},{"a":2,"n":"Main","is":true,"t":8,"sn":"Main","rt":$n[0].Object},{"a":2,"n":"Refresh","is":true,"t":8,"sn":"Refresh","rt":$n[0].Object},{"a":2,"n":"Remove","is":true,"t":8,"pi":[{"n":"gameObject","pt":$n[2].GameObject,"ps":0}],"sn":"Remove","rt":$n[0].Object,"p":[$n[2].GameObject]},{"a":1,"n":"Save","is":true,"t":8,"sn":"Save","rt":$n[0].Object},{"a":2,"n":"SaveChanges","is":true,"t":8,"pi":[{"n":"reference","pt":$n[4].LevelEditorReference,"ps":0}],"sn":"SaveChanges","rt":$n[0].Object,"p":[$n[4].LevelEditorReference]},{"a":2,"n":"Select","is":true,"t":8,"pi":[{"n":"gameObject","pt":$n[2].GameObject,"ps":0}],"sn":"Select","rt":$n[0].Object,"p":[$n[2].GameObject]},{"a":2,"n":"WaitForClick","is":true,"t":8,"sn":"WaitForClick","rt":$n[1].Task$1},{"a":1,"n":"allowed","is":true,"t":4,"rt":$n[0].Array.type(Function),"sn":"allowed","ro":true},{"a":2,"n":"creation","is":true,"t":4,"rt":System.Object,"sn":"creation"},{"a":1,"n":"cross","is":true,"t":4,"rt":HTMLImageElement,"sn":"cross"},{"a":1,"n":"game","is":true,"t":4,"rt":$n[2].Game,"sn":"game"},{"a":1,"n":"left","is":true,"t":4,"rt":HTMLDivElement,"sn":"left"},{"a":1,"n":"mouseDownEvent","is":true,"t":4,"rt":$n[1].TaskCompletionSource,"sn":"mouseDownEvent"},{"a":1,"n":"right","is":true,"t":4,"rt":HTMLDivElement,"sn":"right"},{"a":1,"n":"selected","is":true,"t":4,"rt":$n[2].GameObject,"sn":"selected"},{"a":1,"n":"table","is":true,"t":4,"rt":HTMLTableElement,"sn":"table"}]}; });
+    $m($n[4].LevelEditorReference, function () { return {"att":1048577,"a":2,"m":[{"a":2,"isSynthetic":true,"n":".ctor","t":1,"sn":"ctor"},{"a":2,"n":"cells","t":4,"rt":$n[3].Dictionary$2(System.String,HTMLElement),"sn":"cells"},{"a":2,"n":"gameObject","t":4,"rt":$n[2].GameObject,"sn":"gameObject"},{"a":2,"n":"members","t":4,"rt":$n[3].Dictionary$2(System.String,System.Object),"sn":"members"}]}; });
 });

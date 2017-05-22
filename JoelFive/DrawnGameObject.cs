@@ -25,7 +25,7 @@ namespace JoelFive
                 @dynamic.image = Image;
             base.Save((object)@dynamic);
         }
-        public bool Selected;
+        internal bool Selected;
         public Rectangle Position = new Rectangle();
         public double X
         {

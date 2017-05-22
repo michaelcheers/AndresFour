@@ -2,10 +2,15 @@
 using Bridge;
 using Bridge.Html5;
 using System.Threading.Tasks;
+using System.Reflection;
+using System.Collections.Generic;
+
+[assembly: Reflectable]
 
 namespace JoelFive.LevelEditor
 {
-    public class App
+
+    public static class App
     {
         static Game game;
         static HTMLDivElement left;
@@ -60,6 +65,7 @@ namespace JoelFive.LevelEditor
             creation = jsonObject;
             start.Style.Display = Display.None;
             game = await Game.Create(jsonObject);
+            game.Canvas.OnClick = Click;
             game.Canvas.Style.Border = "1px solid black";
             Document.Body.AppendChild(left = new HTMLDivElement());
             Document.Body.AppendChild(right = new HTMLDivElement());
@@ -78,29 +84,203 @@ namespace JoelFive.LevelEditor
             button.Style.Bottom = "0";
             button.Style.Left = "0";
             Document.Body.AppendChild(button);
-            Reload();
+            Refresh();
         }
 
         public static void Remove (GameObject gameObject)
         {
             if (!game.Children.Remove(gameObject))
                 throw new Exception();
-            Reload();
+            Refresh();
         }
 
-        public static void Reload ()
+        public static void CreateCell (HTMLTableElement table, params Node[] toAppend)
         {
-            table.InnerHTML = "";
             var row1 = new HTMLTableRowElement();
             table.AppendChild(row1);
             var cell1 = new HTMLTableDataCellElement();
-            cell1.AppendChild(new HTMLAnchorElement
+            foreach (var append in toAppend)
+                cell1.AppendChild(append);
+            row1.AppendChild(cell1);
+        }
+
+        public static LevelEditorReference CreateReference (GameObject gameObject, out HTMLTableElement outTable)
+        {
+            LevelEditorReference result = new LevelEditorReference
+            {
+                gameObject = gameObject,
+                cells = new Dictionary<string, HTMLElement>(),
+                members = new Dictionary<string, MemberInfo>()
+            };
+            string type;
+            if (gameObject is Character)
+                type = "Character";
+            else if (gameObject is RealGameObject)
+                type = "Real Thing";
+            else if (gameObject is DrawnGameObject)
+                type = "Illusion";
+            else
+                throw new Exception($"Type not allowed: {gameObject.GetType().FullName}");
+            HTMLTableElement table = new HTMLTableElement();
+            HTMLTableRowElement row = new HTMLTableRowElement();
+            HTMLTableDataCellElement cell = new HTMLTableDataCellElement
+            {
+                InnerHTML = "Type"
+            };
+            HTMLTableDataCellElement cell2 = new HTMLTableDataCellElement
+            {
+                InnerHTML = type
+            };
+            result.cells.Add("Type", cell2);
+            row.AppendChild(cell);
+            row.AppendChild(cell2);
+            table.AppendChild(row);
+            List<MemberInfo> fields = new List<MemberInfo>(gameObject.GetType().GetFields());
+            fields.AddRange(gameObject.GetType().GetProperties());
+            foreach (var field in fields)
+            {
+                if (field.IsStatic) continue;
+                Type memberType;
+                if (field is FieldInfo)
+                    memberType = ((FieldInfo)field).FieldType;
+                else if (field is PropertyInfo)
+                    memberType = ((PropertyInfo)field).PropertyType;
+                else
+                    throw new Exception();
+                if (allowed.Contains(memberType))
+                {
+                    object value;
+                    if (field is FieldInfo)
+                        value = ((FieldInfo)field).GetValue(gameObject);
+                    else if (field is PropertyInfo)
+                        value = ((PropertyInfo)field).GetValue(gameObject);
+                    else
+                        throw new Exception();
+                    row = new HTMLTableRowElement();
+                    string valueString;
+                    if (value is string)
+                        valueString = (string)value;
+                    else if (value is double)
+                        valueString = ((double)value).ToString();
+                    else
+                        throw new Exception();
+                    cell = new HTMLTableDataCellElement
+                    {
+                        InnerHTML = field.Name
+                    };
+                    cell2 = new HTMLTableDataCellElement
+                    {
+                        ContentEditable = ContentEditable.True,
+                        InnerHTML = valueString
+                    };
+                    result.cells.Add(field.Name, cell2);
+                    result.members.Add(field.Name, field);
+                    row.AppendChild(cell);
+                    row.AppendChild(cell2);
+                    table.AppendChild(row);
+                }
+            }
+            row = new HTMLTableRowElement();
+            cell = new HTMLTableDataCellElement();
+            cell.AppendChild(new HTMLButtonElement
+            {
+                InnerHTML = "Save Changes",
+                OnClick = e => SaveChanges(result)
+            });
+            row.AppendChild(cell);
+            table.AppendChild(row);
+            outTable = table;
+            return result;
+        }
+
+        static readonly Type[] allowed = { typeof(string), typeof(double)};
+
+        public static void SaveChanges (LevelEditorReference reference)
+        {
+            foreach (var cell in reference.cells)
+            {
+                if (cell.Key == "Type")
+                    continue;
+                var memberInfo = reference.members[cell.Key];
+                Type value;
+                if (memberInfo is FieldInfo)
+                    value = ((FieldInfo)memberInfo).FieldType;
+                else if (memberInfo is PropertyInfo)
+                    value = ((PropertyInfo)memberInfo).PropertyType;
+                else
+                    throw new Exception();
+                object toWriteValue;
+                if (value == typeof(string))
+                    toWriteValue = cell.Value.InnerHTML;
+                else if (value == typeof(double))
+                    toWriteValue = double.Parse(cell.Value.InnerHTML);
+                else
+                    throw new Exception();
+                if (memberInfo is FieldInfo)
+                    ((FieldInfo)memberInfo).SetValue(reference.gameObject, toWriteValue);
+                else
+                    ((PropertyInfo)memberInfo).SetValue(reference.gameObject, toWriteValue);
+            }
+            Refresh();
+        }
+
+        public static void Click (MouseEvent<HTMLCanvasElement> mouseEvent)
+        {
+            mouseDownEvent?.SetResult(new Vector2
+            {
+                X = mouseEvent.LayerX,
+                Y = mouseEvent.LayerY
+            });
+        }
+
+        static TaskCompletionSource<Vector2> mouseDownEvent;
+
+        public static async Task<Vector2> WaitForClick ()
+        {
+            mouseDownEvent = new TaskCompletionSource<Vector2>();
+            Vector2 result = await mouseDownEvent.Task;
+            mouseDownEvent = null;
+            return result;
+        }
+
+        public static async void CreateRectangle()
+        {
+            Vector2 a = await WaitForClick();
+            Vector2 b = await WaitForClick();
+            Rectangle rect = new Rectangle
+            {
+                X = a.X,
+                Y = a.Y,
+                Width = b.X - a.X,
+                Height = b.Y - a.Y
+            };
+            RealGameObject created = new RealGameObject
+            {
+                Gravity = 0,
+                Position = rect,
+                Image = "#ffffff",
+                Name = "New Object"
+            };
+            game.Children.Add(created);
+            Select(created);
+            Refresh();
+        }
+
+        public static void Refresh ()
+        {
+            table.InnerHTML = "";
+            CreateCell(table, new HTMLAnchorElement
+            {
+                Href = "javascript:void(0)",
+                InnerHTML = "Create Rectangle",
+                OnClick = e => CreateRectangle()
+            });
+            CreateCell(table, new HTMLAnchorElement
             {
                 Href = "javascript:void(0)",
                 OnClick = e => Select(null),
                 InnerHTML = "Unselect"
             });
-            row1.AppendChild(cell1);
             foreach (var gameObject in game.Children)
             {
                 if (string.IsNullOrEmpty(gameObject.Name))
@@ -123,17 +303,9 @@ namespace JoelFive.LevelEditor
                 cross.AppendChild(App.cross = App.cross.CloneNode().As<HTMLImageElement>());
                 cell.AppendChild(cross);
                 cell.AppendChild(new HTMLBRElement());
-                string text;
-                if (gameObject is Character)
-                    text = "Character";
-                else if (gameObject is RealGameObject)
-                    text = "Real Thing";
-                else if (gameObject is DrawnGameObject)
-                    text = "Illusion";
-                else
-                    throw new Exception($"Type not allowed: {gameObject.GetType().FullName}");
-                cell.AppendChild(new Text($"Type: {text}"));
-
+                HTMLTableElement tableNested;
+                var reference = CreateReference(gameObject, out tableNested);
+                cell.AppendChild(tableNested);
                 row.AppendChild(cell);
                 table.AppendChild(row);
             }
@@ -149,7 +321,7 @@ namespace JoelFive.LevelEditor
                 selected.As<DrawnGameObject>().Selected = false;
             if ((selected = gameObject) is DrawnGameObject)
                 gameObject.As<DrawnGameObject>().Selected = true;
-            Reload();
+            Refresh();
         }
     }
 }

@@ -9,7 +9,7 @@ namespace JoelFive
     public class RealGameObject : DrawnGameObject
     {
         public new const string Type = "real game object";
-        public int Gravity;
+        public double Gravity;
 
         public override void Save(dynamic dynamic)
         {
@@ -140,6 +140,6 @@ namespace JoelFive
                 Y = Gravity
             });
         }
-        public bool onSolid;
+        internal bool onSolid;
     }
 }
