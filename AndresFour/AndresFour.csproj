@@ -36,7 +36,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="App.cs" />
+    <Compile Include="LevelEditor.cs" />
+    <Compile Include="LevelEditorReference.cs" />
+    <Compile Include="MainStarter.cs" />
     <Compile Include="Character.cs" />
     <Compile Include="DrawnGameObject.cs" />
     <Compile Include="Game.cs" />

@@ -3,9 +3,9 @@ using Bridge;
 using Bridge.Html5;
 using System.Threading.Tasks;
 
-namespace JoelFive
+namespace AndresFour
 {
-    public class App
+    public class MainStarter
     {
 
         static Task<string> FileRead(HTMLInputElement fileInput)
@@ -17,7 +17,21 @@ namespace JoelFive
             fileReader.readAsText(file);
             return task.Task;
         }
-        public static async void Main ()
+        public static void Main ()
+        {
+            Document.Body.AppendChild(new HTMLAnchorElement
+            {
+                InnerHTML = "Play Game",
+                OnClick = e => MainStarter.Start()
+            });
+            Document.Body.AppendChild(new HTMLBRElement());
+            Document.Body.AppendChild(new HTMLAnchorElement
+            {
+                InnerHTML = "Level Editor",
+                OnClick = e => LevelEditor.Start()
+            });
+        }
+        public static async void Start ()
         {
             HTMLDivElement start = new HTMLDivElement();
             HTMLInputElement input = new HTMLInputElement();
