@@ -13,8 +13,8 @@
     <ProjectGuid>{3B22778C-8475-435C-AC43-8AC11F311CF9}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>JoelFive</RootNamespace>
-    <AssemblyName>JoelFive</AssemblyName>
+    <RootNamespace>AndresFour</RootNamespace>
+    <AssemblyName>AndresFour</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>

@@ -13,8 +13,8 @@
     <ProjectGuid>{18A73B1B-911F-4E32-BBF2-3376FE53665F}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>JoelFive.LevelEditor</RootNamespace>
-    <AssemblyName>JoelFive.LevelEditor</AssemblyName>
+    <RootNamespace>AndresFour.LevelEditor</RootNamespace>
+    <AssemblyName>AndresFour.LevelEditor</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -36,31 +36,31 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="..\JoelFive\BridgeEssentials.cs">
+    <Compile Include="..\AndresFour\BridgeEssentials.cs">
       <Link>BridgeEssentials.cs</Link>
     </Compile>
-    <Compile Include="..\JoelFive\Character.cs">
+    <Compile Include="..\AndresFour\Character.cs">
       <Link>Character.cs</Link>
     </Compile>
-    <Compile Include="..\JoelFive\DrawnGameObject.cs">
+    <Compile Include="..\AndresFour\DrawnGameObject.cs">
       <Link>DrawnGameObject.cs</Link>
     </Compile>
-    <Compile Include="..\JoelFive\Game.cs">
+    <Compile Include="..\AndresFour\Game.cs">
       <Link>Game.cs</Link>
     </Compile>
-    <Compile Include="..\JoelFive\GameObject.cs">
+    <Compile Include="..\AndresFour\GameObject.cs">
       <Link>GameObject.cs</Link>
     </Compile>
-    <Compile Include="..\JoelFive\Movement.cs">
+    <Compile Include="..\AndresFour\Movement.cs">
       <Link>Movement.cs</Link>
     </Compile>
-    <Compile Include="..\JoelFive\RealGameObject.cs">
+    <Compile Include="..\AndresFour\RealGameObject.cs">
       <Link>RealGameObject.cs</Link>
     </Compile>
-    <Compile Include="..\JoelFive\Rectangle.cs">
+    <Compile Include="..\AndresFour\Rectangle.cs">
       <Link>Rectangle.cs</Link>
     </Compile>
-    <Compile Include="..\JoelFive\Vector2.cs">
+    <Compile Include="..\AndresFour\Vector2.cs">
       <Link>Vector2.cs</Link>
     </Compile>
     <Compile Include="App.cs" />

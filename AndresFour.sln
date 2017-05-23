@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26430.6
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JoelFive", "JoelFive\JoelFive.csproj", "{3B22778C-8475-435C-AC43-8AC11F311CF9}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AndresFour", "AndresFour\AndresFour.csproj", "{3B22778C-8475-435C-AC43-8AC11F311CF9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JoelFive.LevelEditor", "JoelFive.LevelEditor\JoelFive.LevelEditor.csproj", "{18A73B1B-911F-4E32-BBF2-3376FE53665F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AndresFour.LevelEditor", "AndresFour.LevelEditor\AndresFour.LevelEditor.csproj", "{18A73B1B-911F-4E32-BBF2-3376FE53665F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
