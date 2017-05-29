@@ -1589,8 +1589,8 @@ Bridge.assembly("AndresFour", function ($asm, globals) {
                 AndresFour.DrawnGameObject.prototype.Save.call(this, dynamic);
             },
             Update: function ($in) {
-                var $t;
-                if (!(($t=new AndresFour.Rectangle(), $t.X = 0, $t.Y = 0, $t.Width = $in.Width, $t.Height = $in.Height, $t).Contains(this.Velocity.$clone()))) {
+                var $t, $t1;
+                if (!(($t=new AndresFour.Rectangle(), $t.X = 0, $t.Y = 0, $t.Width = $in.Width, $t.Height = $in.Height, $t).Contains(($t1=new AndresFour.Vector2(), $t1.X = this.Position.X, $t1.Y = this.Position.Y, $t1)))) {
                     $in.Children.remove(this);
                 }
                 this.X += this.Velocity.X;

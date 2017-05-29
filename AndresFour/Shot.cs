@@ -36,7 +36,11 @@ namespace AndresFour
                 Y = 0,
                 Width = @in.Width,
                 Height = @in.Height
-            }.Contains(Velocity)))
+            }.Contains(new Vector2
+            {
+                X = Position.X,
+                Y = Position.Y
+            })))
                 @in.Children.Remove(this);
             X += Velocity.X;
             Y += Velocity.Y;
