@@ -1,4 +1,5 @@
 ﻿using Bridge;
+using Bridge.Html5;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,46 +11,49 @@ namespace AndresFour
     public class Character : RealGameObject
     {
         public new const string Type = "character";
-        public List<Movement> movements;
+        public List<OnKeyEvent> keyEvents;
 
         public override void Save(dynamic dynamic)
         {
-            dynamic.movements = movements.ConvertAll(v => Script.ToPlainObject(new
-            {
-                keys = v.Keys.ToArray(),
-                x = v.Velocity.X,
-                y = v.Velocity.Y
-            })).ToArray();
+            dynamic.keyEvents = keyEvents.ConvertAll(v => v.ToDynamic()).ToArray();
             base.Save((object)dynamic);
         }
 
-        public override void Update (Game @in)
+        public override void Update (Level @in)
         {
             base.Update(@in);
-            if (onSolid)
-                foreach (var movement in movements)
-                    if (movement.Keys.All(key => @in.Down.Contains(key)))
+            foreach (var keyEvent in keyEvents)
+            {
+                if (keyEvent.Keys.All(key => @in.Down.Contains(key)))
+                {
+                    if (keyEvent is Movement)
                     {
-                        TryMove(@in, movement.Velocity);
+                        Movement movement = keyEvent.As<Movement>();
+                        if (onSolid)
+                        {
+                            TryMove(@in, movement.Velocity);
+                            break;
+                        }
+                    }
+                    else if (keyEvent is Shoot_OnKey)
+                    {
+                        Shoot_OnKey shoot = keyEvent.As<Shoot_OnKey>();
+                        shoot.CreateShot.x = X;
+                        shoot.CreateShot.y = Y;
+                        Task<GameObject> created = Create(shoot.CreateShot);
+                        created.ContinueWith(val => @in.Children.Add(val.Result));
                         break;
                     }
+                }
+            }
         }
 
         public override async Task Parse (dynamic @dynamic)
         {
-            movements = new List<Movement>();
-            foreach (var movementDynamic in @dynamic.movements)
+            keyEvents = new List<OnKeyEvent>();
+            foreach (var keyEventDynamic in @dynamic.keyEvents)
             {
-                Movement movement = new Movement
-                {
-                    Velocity = new Vector2
-                    {
-                        X = movementDynamic.x,
-                        Y = movementDynamic.y
-                    },
-                    Keys = ((int[])movementDynamic.keys).ToList()
-                };
-                movements.Add(movement);
+                keyEvents.Add(await OnKeyEvent.Create(keyEventDynamic));
             }
             await base.Parse((object)@dynamic);
         }

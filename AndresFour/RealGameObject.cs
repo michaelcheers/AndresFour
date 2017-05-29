@@ -22,7 +22,7 @@ namespace AndresFour
             Gravity = @dynamic.gravity;
             await base.Parse((object)@dynamic);
         }
-        public bool TryMove (Game @in, double NotMovingIn, ref double MovingIn, double NotMovingInLength, double MovingInLength, double Velocity, Func<Rectangle, double> GetMovingIn, Func<Rectangle, double> GetMovingInLength)
+        public bool TryMove (Level @in, double NotMovingIn, ref double MovingIn, double NotMovingInLength, double MovingInLength, double Velocity, Func<Rectangle, double> GetMovingIn, Func<Rectangle, double> GetMovingInLength)
         {
             if (Velocity < 0)
                 return TryMoveNegative(@in, NotMovingIn, ref MovingIn, NotMovingInLength, MovingInLength, -Velocity, GetMovingIn, GetMovingInLength);
@@ -68,7 +68,7 @@ namespace AndresFour
             }
             return true;
         }
-        public bool TryMoveNegative (Game @in, double NotMovingIn, ref double MovingIn, double NotMovingInLength, double MovingInLength, double Velocity, Func<Rectangle, double> GetMovingIn, Func<Rectangle, double> GetMovingInLength)
+        public bool TryMoveNegative (Level @in, double NotMovingIn, ref double MovingIn, double NotMovingInLength, double MovingInLength, double Velocity, Func<Rectangle, double> GetMovingIn, Func<Rectangle, double> GetMovingInLength)
         {
             List<RealGameObject> intersects = new List<RealGameObject>();
             foreach (var child in @in.Children)
@@ -112,7 +112,7 @@ namespace AndresFour
             }
             return true;
         }
-        public bool TryMove (Game @in, Vector2 velocity)
+        public bool TryMove (Level @in, Vector2 velocity)
         {
             if (velocity.X != 0 && velocity.Y != 0)
             {
@@ -133,7 +133,7 @@ namespace AndresFour
                 return TryMove(@in, Position.X, ref Position.Y, Position.Width, Position.Height, velocity.Y, v => v.Y, v => v.Height);
             return true;
         }
-        public virtual void Update (Game @in)
+        public override void Update (Level @in)
         {
             onSolid = !TryMove(@in, new Vector2
             {

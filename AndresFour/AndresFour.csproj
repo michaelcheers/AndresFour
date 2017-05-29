@@ -41,13 +41,16 @@
     <Compile Include="MainStarter.cs" />
     <Compile Include="Character.cs" />
     <Compile Include="DrawnGameObject.cs" />
-    <Compile Include="Game.cs" />
+    <Compile Include="Level.cs" />
     <Compile Include="GameObject.cs" />
     <Compile Include="BridgeEssentials.cs" />
     <Compile Include="Movement.cs" />
+    <Compile Include="OnKeyEvent.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RealGameObject.cs" />
     <Compile Include="Rectangle.cs" />
+    <Compile Include="Shoot_OnKey.cs" />
+    <Compile Include="Shot.cs" />
     <Compile Include="Vector2.cs" />
   </ItemGroup>
   <ItemGroup>

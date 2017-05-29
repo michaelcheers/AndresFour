@@ -12,6 +12,11 @@ namespace AndresFour
         public double Y;
         double _width;
         double _height;
+
+        public bool Contains(Vector2 value)
+        {
+            return ((((this.X <= value.X) && (value.X < (this.X + this.Width))) && (this.Y <= value.Y)) && (value.Y < (this.Y + this.Height)));
+        }
         public double Width
         {
             get

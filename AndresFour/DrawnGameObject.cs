@@ -73,7 +73,7 @@ namespace AndresFour
         }
         public Union<HTMLImageElement, string> Image;
 
-        public virtual async Task Parse (dynamic @dynamic)
+        public override async Task Parse (dynamic @dynamic)
         {
             X = @dynamic.x;
             Y = @dynamic.y;
@@ -84,6 +84,7 @@ namespace AndresFour
                 Image = imageString;
             else
                 Image = await BridgeEssentials.LoadImage(imageString);
+            await base.Parse((object)dynamic);
         }
     }
 }

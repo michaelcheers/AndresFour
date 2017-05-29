@@ -9,17 +9,20 @@ using System.Runtime.CompilerServices;
 
 namespace AndresFour
 {
-    public class Game
+    public class Level
     {
         public List<GameObject> Children;
         public int Interval;
         public int DrawInterval;
         public HTMLCanvasElement Canvas;
         public HashSet<int> Down;
-        public static async Task<Game> Create(dynamic @dynamic)
+        public string Name;
+        public double Width;
+        public double Height;
+        public static async Task<Level> Create(dynamic @dynamic, string name)
         {
             List<GameObject> children;
-            Game game = new Game
+            Level game = new Level
             {
                 Children = children = new List<GameObject>(),
                 Interval = @dynamic.interval,
@@ -29,7 +32,10 @@ namespace AndresFour
                     Width = @dynamic.width,
                     Height = @dynamic.height
                 },
-                Down = new HashSet<int>()
+                Down = new HashSet<int>(),
+                Name = name,
+                Width = @dynamic.width,
+                Height = @dynamic.height
             };
             foreach (var item in (dynamic[])@dynamic.children)
                 children.Add(await GameObject.Create(item));
@@ -68,7 +74,7 @@ namespace AndresFour
                         context.FillRect((int)drawObject.X, (int)drawObject.Y, (int)drawObject.Width, (int)drawObject.Height);
                     }
                     else
-                        context.DrawImage(drawObject.Image.As<HTMLImageElement>(), drawObject.X, drawObject.Y);
+                        context.DrawImage(drawObject.Image.As<HTMLImageElement>(), drawObject.X, drawObject.Y, drawObject.Width, drawObject.Height);
                     if (drawObject.Selected)
                     {
                         context.StrokeStyle = "#4286f4";
@@ -80,8 +86,7 @@ namespace AndresFour
         public void Update ()
         {
             foreach (var child in Children)
-                if (child is RealGameObject)
-                    child.As<RealGameObject>().Update(this);
+                child.Update(this);
         }
     }
 }

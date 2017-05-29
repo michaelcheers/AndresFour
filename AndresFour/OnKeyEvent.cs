@@ -6,22 +6,21 @@ using System.Threading.Tasks;
 
 namespace AndresFour
 {
-    public class Movement : OnKeyEvent
+    public abstract class OnKeyEvent : GameObject
     {
-        public Vector2 Velocity;
-        public const string Type = "movement";
+#pragma warning disable CS0108 // Member hides inherited member; missing new keyword
+        public List<int> Keys;
+#pragma warning restore CS0108 // Member hides inherited member; missing new keyword
 
         public override void Save(dynamic dynamic)
         {
-            dynamic.x = Velocity.X;
-            dynamic.y = Velocity.Y;
+            dynamic.keys = Keys.ToArray();
             base.Save((object)dynamic);
         }
 
         public override Task Parse(dynamic dynamic)
         {
-            Velocity.X = dynamic.x;
-            Velocity.Y = dynamic.y;
+            Keys = new List<int>((int[])dynamic.keys);
             return base.Parse((object)dynamic);
         }
     }
