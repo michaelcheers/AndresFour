@@ -39,8 +39,8 @@ namespace AndresFour
                     else if (keyEvent is Shoot_OnKey && !keyEvent.WasLastFrame)
                     {
                         Shoot_OnKey shoot = keyEvent.As<Shoot_OnKey>();
-                        shoot.CreateShot.x = X;
-                        shoot.CreateShot.y = Y;
+                        shoot.CreateShot.x = X + Width / 2 - ((double)shoot.CreateShot.width) / 2;
+                        shoot.CreateShot.y = Y + Height / 2 - ((double)shoot.CreateShot.height) / 2;
                         Task<GameObject> created = Create(shoot.CreateShot);
                         created.ContinueWith(val => @in.Children.Add(val.Result));
                         keyEvent.WasLastFrame = true;

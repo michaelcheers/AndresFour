@@ -1646,8 +1646,8 @@ Bridge.assembly("AndresFour", function ($asm, globals) {
                                     }
                                 } else if (Bridge.is(keyEvent, AndresFour.Shoot_OnKey) && !keyEvent.WasLastFrame) {
                                     var shoot = keyEvent;
-                                    shoot.CreateShot.x = this.X;
-                                    shoot.CreateShot.y = this.Y;
+                                    shoot.CreateShot.x = this.X + this.Width / 2 - Bridge.cast(shoot.CreateShot.width, System.Double) / 2;
+                                    shoot.CreateShot.y = this.Y + this.Height / 2 - Bridge.cast(shoot.CreateShot.height, System.Double) / 2;
                                     var created = AndresFour.GameObject.Create(shoot.CreateShot);
                                     created.continueWith(function (val) {
                                         $in.Children.add(val.getResult());
