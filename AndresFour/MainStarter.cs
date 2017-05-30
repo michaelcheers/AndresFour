@@ -83,7 +83,61 @@ namespace AndresFour
                                     width = 20,
                                     height = 4,
                                     image = "#eeeeee",
-                                    gravity = 0.01,
+                                    gravity = 0,
+                                    type = Shot.Type
+                                })
+                            }),
+                            Script.ToPlainObject(new
+                            {
+                                keys = /*Script.ToPlainObject*/(new[]
+                                {
+                                    KeyboardEvent.DOM_VK_LEFT
+                                }),
+                                type = Shoot_OnKey.Type,
+                                shot = Script.ToPlainObject(new
+                                {
+                                    vX = -1,
+                                    vY = 0,
+                                    width = 20,
+                                    height = 4,
+                                    image = "#eeeeee",
+                                    gravity = 0,
+                                    type = Shot.Type
+                                })
+                            }),
+                            Script.ToPlainObject(new
+                            {
+                                keys = /*Script.ToPlainObject*/(new[]
+                                {
+                                    KeyboardEvent.DOM_VK_DOWN
+                                }),
+                                type = Shoot_OnKey.Type,
+                                shot = Script.ToPlainObject(new
+                                {
+                                    vX = 0,
+                                    vY = 1,
+                                    width = 4,
+                                    height = 20,
+                                    image = "#eeeeee",
+                                    gravity = 0,
+                                    type = Shot.Type
+                                })
+                            }),
+                            Script.ToPlainObject(new
+                            {
+                                keys = /*Script.ToPlainObject*/(new[]
+                                {
+                                    KeyboardEvent.DOM_VK_UP
+                                }),
+                                type = Shoot_OnKey.Type,
+                                shot = Script.ToPlainObject(new
+                                {
+                                    vX = 0,
+                                    vY = -1,
+                                    width = 4,
+                                    height = 20,
+                                    image = "#eeeeee",
+                                    gravity = 0,
                                     type = Shot.Type
                                 })
                             })
