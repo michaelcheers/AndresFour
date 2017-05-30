@@ -8,6 +8,7 @@ namespace AndresFour
 {
     public abstract class OnKeyEvent : GameObject
     {
+        public bool WasLastFrame = false;
 #pragma warning disable CS0108 // Member hides inherited member; missing new keyword
         public List<int> Keys;
 #pragma warning restore CS0108 // Member hides inherited member; missing new keyword

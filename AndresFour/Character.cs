@@ -32,19 +32,23 @@ namespace AndresFour
                         if (onSolid)
                         {
                             TryMove(@in, movement.Velocity);
+                            keyEvent.WasLastFrame = true;
                             break;
                         }
                     }
-                    else if (keyEvent is Shoot_OnKey)
+                    else if (keyEvent is Shoot_OnKey && !keyEvent.WasLastFrame)
                     {
                         Shoot_OnKey shoot = keyEvent.As<Shoot_OnKey>();
                         shoot.CreateShot.x = X;
                         shoot.CreateShot.y = Y;
                         Task<GameObject> created = Create(shoot.CreateShot);
                         created.ContinueWith(val => @in.Children.Add(val.Result));
+                        keyEvent.WasLastFrame = true;
                         break;
                     }
+                    keyEvent.WasLastFrame = true;
                 }
+                else keyEvent.WasLastFrame = false;
             }
         }
 

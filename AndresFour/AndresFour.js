@@ -1303,7 +1303,13 @@ Bridge.assembly("AndresFour", function ($asm, globals) {
     Bridge.define("AndresFour.OnKeyEvent", {
         inherits: [AndresFour.GameObject],
         fields: {
+            WasLastFrame: false,
             Keys: null
+        },
+        ctors: {
+            init: function () {
+                this.WasLastFrame = false;
+            }
         },
         methods: {
             Save: function (dynamic) {
@@ -1635,9 +1641,10 @@ Bridge.assembly("AndresFour", function ($asm, globals) {
                                     var movement = keyEvent;
                                     if (this.onSolid) {
                                         this.TryMove($in, movement.Velocity.$clone());
+                                        keyEvent.WasLastFrame = true;
                                         return {jump:2};
                                     }
-                                } else if (Bridge.is(keyEvent, AndresFour.Shoot_OnKey)) {
+                                } else if (Bridge.is(keyEvent, AndresFour.Shoot_OnKey) && !keyEvent.WasLastFrame) {
                                     var shoot = keyEvent;
                                     shoot.CreateShot.x = this.X;
                                     shoot.CreateShot.y = this.Y;
@@ -1645,8 +1652,12 @@ Bridge.assembly("AndresFour", function ($asm, globals) {
                                     created.continueWith(function (val) {
                                         $in.Children.add(val.getResult());
                                     });
+                                    keyEvent.WasLastFrame = true;
                                     return {jump:2};
                                 }
+                                keyEvent.WasLastFrame = true;
+                            } else {
+                                keyEvent.WasLastFrame = false;
                             }
                         }).call(this) || {};
                         if($t1.jump == 2) break;
@@ -1754,7 +1765,7 @@ Bridge.assembly("AndresFour", function ($asm, globals) {
     $m($n[1].GameObject, function () { return {"att":1048705,"a":2,"m":[{"a":3,"isSynthetic":true,"n":".ctor","t":1,"sn":"ctor"},{"a":2,"n":"Create","is":true,"t":8,"pi":[{"n":"dynamic","pt":System.Object,"ps":0}],"sn":"Create","rt":$n[2].Task$1,"p":[System.Object]},{"v":true,"a":2,"n":"Parse","t":8,"pi":[{"n":"dynamic","pt":System.Object,"ps":0}],"sn":"Parse","rt":$n[2].Task,"p":[System.Object]},{"v":true,"a":2,"n":"Save","t":8,"pi":[{"n":"dynamic","pt":System.Object,"ps":0}],"sn":"Save","rt":$n[3].Object,"p":[System.Object]},{"ov":true,"a":2,"n":"ToDynamic","t":8,"sn":"toDynamic","rt":System.Object},{"v":true,"a":2,"n":"Update","t":8,"pi":[{"n":"in","pt":$n[1].Level,"ps":0}],"sn":"Update","rt":$n[3].Object,"p":[$n[1].Level]},{"a":2,"n":"Name","t":4,"rt":$n[3].String,"sn":"Name"}]}; });
     $m($n[1].BridgeEssentials, function () { return {"att":1048961,"a":2,"s":true,"m":[{"a":2,"n":"LoadImage","is":true,"t":8,"pi":[{"n":"value","pt":$n[3].String,"ps":0}],"sn":"LoadImage","rt":$n[2].Task$1,"p":[$n[3].String]}]}; });
     $m($n[1].Movement, function () { return {"att":1048577,"a":2,"m":[{"a":2,"isSynthetic":true,"n":".ctor","t":1,"sn":"ctor"},{"ov":true,"a":2,"n":"Parse","t":8,"pi":[{"n":"dynamic","pt":System.Object,"ps":0}],"sn":"Parse","rt":$n[2].Task,"p":[System.Object]},{"ov":true,"a":2,"n":"Save","t":8,"pi":[{"n":"dynamic","pt":System.Object,"ps":0}],"sn":"Save","rt":$n[3].Object,"p":[System.Object]},{"a":2,"n":"Type","is":true,"t":4,"rt":$n[3].String,"sn":"Type"},{"a":2,"n":"Velocity","t":4,"rt":$n[1].Vector2,"sn":"Velocity"}]}; });
-    $m($n[1].OnKeyEvent, function () { return {"att":1048705,"a":2,"m":[{"a":3,"isSynthetic":true,"n":".ctor","t":1,"sn":"ctor"},{"ov":true,"a":2,"n":"Parse","t":8,"pi":[{"n":"dynamic","pt":System.Object,"ps":0}],"sn":"Parse","rt":$n[2].Task,"p":[System.Object]},{"ov":true,"a":2,"n":"Save","t":8,"pi":[{"n":"dynamic","pt":System.Object,"ps":0}],"sn":"Save","rt":$n[3].Object,"p":[System.Object]},{"a":2,"n":"Keys","t":4,"rt":$n[0].List$1(System.Int32),"sn":"Keys"}]}; });
+    $m($n[1].OnKeyEvent, function () { return {"att":1048705,"a":2,"m":[{"a":3,"isSynthetic":true,"n":".ctor","t":1,"sn":"ctor"},{"ov":true,"a":2,"n":"Parse","t":8,"pi":[{"n":"dynamic","pt":System.Object,"ps":0}],"sn":"Parse","rt":$n[2].Task,"p":[System.Object]},{"ov":true,"a":2,"n":"Save","t":8,"pi":[{"n":"dynamic","pt":System.Object,"ps":0}],"sn":"Save","rt":$n[3].Object,"p":[System.Object]},{"a":2,"n":"Keys","t":4,"rt":$n[0].List$1(System.Int32),"sn":"Keys"},{"a":2,"n":"WasLastFrame","t":4,"rt":$n[3].Boolean,"sn":"WasLastFrame"}]}; });
     $m($n[1].RealGameObject, function () { return {"att":1048577,"a":2,"m":[{"a":2,"isSynthetic":true,"n":".ctor","t":1,"sn":"ctor"},{"ov":true,"a":2,"n":"Parse","t":8,"pi":[{"n":"dynamic","pt":System.Object,"ps":0}],"sn":"Parse","rt":$n[2].Task,"p":[System.Object]},{"ov":true,"a":2,"n":"Save","t":8,"pi":[{"n":"dynamic","pt":System.Object,"ps":0}],"sn":"Save","rt":$n[3].Object,"p":[System.Object]},{"a":2,"n":"TryMove","t":8,"pi":[{"n":"in","pt":$n[1].Level,"ps":0},{"n":"velocity","pt":$n[1].Vector2,"ps":1}],"sn":"TryMove","rt":$n[3].Boolean,"p":[$n[1].Level,$n[1].Vector2]},{"a":2,"n":"TryMove","t":8,"pi":[{"n":"in","pt":$n[1].Level,"ps":0},{"n":"NotMovingIn","pt":$n[3].Double,"ps":1},{"n":"MovingIn","ref":true,"pt":$n[3].Double,"ps":2},{"n":"NotMovingInLength","pt":$n[3].Double,"ps":3},{"n":"MovingInLength","pt":$n[3].Double,"ps":4},{"n":"Velocity","pt":$n[3].Double,"ps":5},{"n":"GetMovingIn","pt":Function,"ps":6},{"n":"GetMovingInLength","pt":Function,"ps":7}],"sn":"TryMove$1","rt":$n[3].Boolean,"p":[$n[1].Level,$n[3].Double,$n[3].Double,$n[3].Double,$n[3].Double,$n[3].Double,Function,Function]},{"a":2,"n":"TryMoveNegative","t":8,"pi":[{"n":"in","pt":$n[1].Level,"ps":0},{"n":"NotMovingIn","pt":$n[3].Double,"ps":1},{"n":"MovingIn","ref":true,"pt":$n[3].Double,"ps":2},{"n":"NotMovingInLength","pt":$n[3].Double,"ps":3},{"n":"MovingInLength","pt":$n[3].Double,"ps":4},{"n":"Velocity","pt":$n[3].Double,"ps":5},{"n":"GetMovingIn","pt":Function,"ps":6},{"n":"GetMovingInLength","pt":Function,"ps":7}],"sn":"TryMoveNegative","rt":$n[3].Boolean,"p":[$n[1].Level,$n[3].Double,$n[3].Double,$n[3].Double,$n[3].Double,$n[3].Double,Function,Function]},{"ov":true,"a":2,"n":"Update","t":8,"pi":[{"n":"in","pt":$n[1].Level,"ps":0}],"sn":"Update","rt":$n[3].Object,"p":[$n[1].Level]},{"a":2,"n":"Gravity","t":4,"rt":$n[3].Double,"sn":"Gravity"},{"a":2,"n":"Type","is":true,"t":4,"rt":$n[3].String,"sn":"Type"},{"a":4,"n":"onSolid","t":4,"rt":$n[3].Boolean,"sn":"onSolid"}]}; });
     $m($n[1].Rectangle, function () { return {"att":1048841,"a":2,"m":[{"a":2,"isSynthetic":true,"n":".ctor","t":1,"sn":"ctor"},{"a":2,"n":"Contains","t":8,"pi":[{"n":"value","pt":$n[1].Vector2,"ps":0}],"sn":"Contains","rt":$n[3].Boolean,"p":[$n[1].Vector2]},{"a":2,"n":"Intersects","t":8,"pi":[{"n":"value","pt":$n[1].Rectangle,"ps":0}],"sn":"Intersects","rt":$n[3].Boolean,"p":[$n[1].Rectangle]},{"a":2,"n":"Height","t":16,"rt":$n[3].Double,"g":{"a":2,"n":"get_Height","t":8,"rt":$n[3].Double,"fg":"Height"},"s":{"a":2,"n":"set_Height","t":8,"p":[$n[3].Double],"rt":$n[3].Object,"fs":"Height"},"fn":"Height"},{"a":2,"n":"Width","t":16,"rt":$n[3].Double,"g":{"a":2,"n":"get_Width","t":8,"rt":$n[3].Double,"fg":"Width"},"s":{"a":2,"n":"set_Width","t":8,"p":[$n[3].Double],"rt":$n[3].Object,"fs":"Width"},"fn":"Width"},{"a":2,"n":"X","t":4,"rt":$n[3].Double,"sn":"X"},{"a":2,"n":"Y","t":4,"rt":$n[3].Double,"sn":"Y"},{"a":1,"n":"_height","t":4,"rt":$n[3].Double,"sn":"_height"},{"a":1,"n":"_width","t":4,"rt":$n[3].Double,"sn":"_width"}]}; });
     $m($n[1].Shoot_OnKey, function () { return {"att":1048577,"a":2,"m":[{"a":2,"isSynthetic":true,"n":".ctor","t":1,"sn":"ctor"},{"ov":true,"a":2,"n":"Parse","t":8,"pi":[{"n":"dynamic","pt":System.Object,"ps":0}],"sn":"Parse","rt":$n[2].Task,"p":[System.Object]},{"ov":true,"a":2,"n":"Save","t":8,"pi":[{"n":"dynamic","pt":System.Object,"ps":0}],"sn":"Save","rt":$n[3].Object,"p":[System.Object]},{"a":2,"n":"CreateShot","t":4,"rt":System.Object,"sn":"CreateShot"},{"a":2,"n":"Type","is":true,"t":4,"rt":$n[3].String,"sn":"Type"}]}; });
