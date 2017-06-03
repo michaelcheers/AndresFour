@@ -329,14 +329,42 @@ namespace AndresFour
             Refresh();
         }
 
+        static async void CreateBlock ()
+        {
+            Vector2 at = await WaitForClick();
+            Rectangle create = new Rectangle
+            {
+                Width = 32,
+                Height = 32,
+                X = at.X - 16,
+                Y = at.Y - 16
+            };
+            RealGameObject created = new RealGameObject
+            {
+                Gravity = 0,
+                Position = create,
+                Image = "#ffffff",
+                Name = "New Block"
+            };
+            level.Children.Add(created);
+            Select(created);
+            Refresh();
+        }
+
         public static void Refresh ()
         {
             table.InnerHTML = "";
+            //CreateCell(table, new HTMLAnchorElement
+            //{
+            //    Href = "javascript:void(0)",
+            //    InnerHTML = "Create Rectangle",
+            //    OnClick = e => CreateRectangle()
+            //});
             CreateCell(table, new HTMLAnchorElement
             {
                 Href = "javascript:void(0)",
-                InnerHTML = "Create Rectangle",
-                OnClick = e => CreateRectangle()
+                InnerHTML = "Create Block",
+                OnClick = e => CreateBlock()
             });
             CreateCell(table, new HTMLAnchorElement
             {

@@ -13,6 +13,15 @@ namespace AndresFour
         double _width;
         double _height;
 
+        public static Rectangle operator + (Rectangle a, Vector2 b) =>
+            new Rectangle
+            {
+                X = a.X + b.X,
+                Y = a.Y + b.Y,
+                Width = a.Width,
+                Height = a.Height
+            };
+
         public bool Contains(Vector2 value)
         {
             return ((((this.X <= value.X) && (value.X < (this.X + this.Width))) && (this.Y <= value.Y)) && (value.Y < (this.Y + this.Height)));

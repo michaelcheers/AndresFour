@@ -31,7 +31,10 @@ namespace AndresFour
                         Movement movement = keyEvent.As<Movement>();
                         if (onSolid)
                         {
-                            TryMove(@in, movement.Velocity);
+                            if (movement.VelocityBased)
+                                Velocity += movement.Velocity;
+                            else
+                                TryMove(@in, movement.Velocity);
                             keyEvent.WasLastFrame = true;
                             break;
                         }
@@ -39,8 +42,17 @@ namespace AndresFour
                     else if (keyEvent is Shoot_OnKey && !keyEvent.WasLastFrame)
                     {
                         Shoot_OnKey shoot = keyEvent.As<Shoot_OnKey>();
-                        shoot.CreateShot.x = X + Width / 2 - ((double)shoot.CreateShot.width) / 2;
-                        shoot.CreateShot.y = Y + Height / 2 - ((double)shoot.CreateShot.height) / 2;
+                        //shoot.CreateShot.x = X + Width / 2 - ((double)shoot.CreateShot.width) / 2;
+                        //shoot.CreateShot.y = Y + Height / 2 - ((double)shoot.CreateShot.height) / 2;
+                        int compareX = ((double)shoot.CreateShot.vX).CompareTo(0);
+                        int compareY = ((double)shoot.CreateShot.vY).CompareTo(0);
+                        Vector2 position = new Vector2
+                        {
+                            X = compareX * Width - (compareX == -1 ? shoot.CreateShot.width : 0),
+                            Y = compareY * Height - (compareY == -1 ? shoot.CreateShot.width : 0)
+                        } + new Vector2 { X = X, Y = Y };
+                        shoot.CreateShot.x = position.X;
+                        shoot.CreateShot.y = position.Y;
                         Task<GameObject> created = Create(shoot.CreateShot);
                         created.ContinueWith(val => @in.Children.Add(val.Result));
                         keyEvent.WasLastFrame = true;

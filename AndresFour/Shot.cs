@@ -6,18 +6,19 @@ using System.Threading.Tasks;
 
 namespace AndresFour
 {
-    public class Shot : DrawnGameObject
+    public class Shot : RealGameObject
     {
-        public Vector2 Velocity;
+        public int Corrosivity;
         public new const string Type = "shot";
 
         public override Task Parse(dynamic dynamic)
         {
-            Velocity = new Vector2
+            Velocity += new Vector2
             {
                 X = dynamic.vX,
                 Y = dynamic.vY
             };
+            Corrosivity = dynamic.corrosivity;
             return base.Parse((object)dynamic);
         }
 
@@ -25,7 +26,15 @@ namespace AndresFour
         {
             dynamic.vX = X;
             dynamic.vY = Y;
+            dynamic.corrosivity = Corrosivity;
             base.Save((object)dynamic);
+        }
+
+        public void Corrode (Level @in)
+        {
+            foreach (RealGameObject intersect in lastIntersects)
+                if (intersect.Strength <= Corrosivity)
+                    @in.Children.Remove(intersect);
         }
 
         public override void Update(Level @in)
@@ -42,8 +51,6 @@ namespace AndresFour
                 Y = Position.Y
             })))
                 @in.Children.Remove(this);
-            X += Velocity.X;
-            Y += Velocity.Y;
             base.Update(@in);
         }
     }

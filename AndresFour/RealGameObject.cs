@@ -10,23 +10,28 @@ namespace AndresFour
     {
         public new const string Type = "real game object";
         public double Gravity;
+        public int Strength = 5;
+        public Vector2 Velocity = new Vector2();
 
         public override void Save(dynamic dynamic)
         {
             dynamic.gravity = Gravity;
+            dynamic.strength = Strength;
             base.Save((object)dynamic);
         }
 
-        public override async Task Parse (dynamic @dynamic)
+        public override Task Parse (dynamic dynamic)
         {
-            Gravity = @dynamic.gravity;
-            await base.Parse((object)@dynamic);
+            Gravity = dynamic.gravity;
+            Strength = dynamic.strength;
+            return base.Parse((object)dynamic);
         }
+        public List<RealGameObject> lastIntersects;
         public bool TryMove (Level @in, double NotMovingIn, ref double MovingIn, double NotMovingInLength, double MovingInLength, double Velocity, Func<Rectangle, double> GetMovingIn, Func<Rectangle, double> GetMovingInLength)
         {
             if (Velocity < 0)
                 return TryMoveNegative(@in, NotMovingIn, ref MovingIn, NotMovingInLength, MovingInLength, -Velocity, GetMovingIn, GetMovingInLength);
-            List<RealGameObject> intersects = new List<RealGameObject>();
+            lastIntersects = new List<RealGameObject>();
             foreach (var child in @in.Children)
             {
                 if (child is RealGameObject)
@@ -55,14 +60,14 @@ namespace AndresFour
                     }
                     bool doesIntersect = rect.Intersects(realGameObject.Position);
                     if (doesIntersect)
-                        intersects.Add(realGameObject);
+                        lastIntersects.Add(realGameObject);
                 }
             }
-            if (intersects.Count == 0)
+            if (lastIntersects.Count == 0)
                 MovingIn += Velocity;
             else
             {
-                double min = intersects.Min(v => GetMovingIn(v.Position) - MovingInLength);
+                double min = lastIntersects.Min(v => GetMovingIn(v.Position) - MovingInLength);
                 MovingIn = min;
                 return false;
             }
@@ -70,7 +75,7 @@ namespace AndresFour
         }
         public bool TryMoveNegative (Level @in, double NotMovingIn, ref double MovingIn, double NotMovingInLength, double MovingInLength, double Velocity, Func<Rectangle, double> GetMovingIn, Func<Rectangle, double> GetMovingInLength)
         {
-            List<RealGameObject> intersects = new List<RealGameObject>();
+            lastIntersects = new List<RealGameObject>();
             foreach (var child in @in.Children)
             {
                 if (child is RealGameObject)
@@ -99,14 +104,14 @@ namespace AndresFour
                     }
                     bool doesIntersect = rect.Intersects(realGameObject.Position);
                     if (doesIntersect)
-                        intersects.Add(realGameObject);
+                        lastIntersects.Add(realGameObject);
                 }
             }
-            if (intersects.Count == 0)
+            if (lastIntersects.Count == 0)
                 MovingIn -= Velocity;
             else
             {
-                double max = intersects.Max(v => GetMovingIn(v.Position) + GetMovingInLength(v.Position));
+                double max = lastIntersects.Max(v => GetMovingIn(v.Position) + GetMovingInLength(v.Position));
                 MovingIn = max;
                 return false;
             }
@@ -135,6 +140,8 @@ namespace AndresFour
         }
         public override void Update (Level @in)
         {
+            if (!TryMove(@in, Velocity *= 0.99))
+                (this as Shot)?.Corrode(@in);
             onSolid = !TryMove(@in, new Vector2
             {
                 Y = Gravity

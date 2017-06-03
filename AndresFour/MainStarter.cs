@@ -47,6 +47,7 @@ namespace AndresFour
                         height = -32,
                         image = "#999999",
                         gravity = 1,
+                        strength = 5,
                         keyEvents = /*Script.ToPlainObject*/(new object[] 
                         {
                             Script.ToPlainObject(new
@@ -57,7 +58,8 @@ namespace AndresFour
                                 }),
                                 x = 1,
                                 y = 0,
-                                type = Movement.Type
+                                type = Movement.Type,
+                                velox = false
                             }),
                             Script.ToPlainObject(new
                             {
@@ -67,7 +69,19 @@ namespace AndresFour
                                 }),
                                 x = -1,
                                 y = 0,
-                                type = Movement.Type
+                                type = Movement.Type,
+                                velox = false
+                            }),
+                            Script.ToPlainObject(new
+                            {
+                                keys = /*Script.ToPlainObject*/(new[]
+                                {
+                                    KeyboardEvent.DOM_VK_SPACE
+                                }),
+                                x = 0,
+                                y = -50,
+                                type = Movement.Type,
+                                velox = true
                             }),
                             Script.ToPlainObject(new
                             {
@@ -78,13 +92,14 @@ namespace AndresFour
                                 type = Shoot_OnKey.Type,
                                 shot = Script.ToPlainObject(new
                                 {
-                                    vX = 1,
+                                    vX = 50,
                                     vY = 0,
                                     width = 20,
                                     height = 4,
                                     image = "#eeeeee",
                                     gravity = 0,
-                                    type = Shot.Type
+                                    type = Shot.Type,
+                                    corrosivity = 1
                                 })
                             }),
                             Script.ToPlainObject(new
@@ -96,13 +111,14 @@ namespace AndresFour
                                 type = Shoot_OnKey.Type,
                                 shot = Script.ToPlainObject(new
                                 {
-                                    vX = -1,
+                                    vX = -50,
                                     vY = 0,
                                     width = 20,
                                     height = 4,
                                     image = "#eeeeee",
                                     gravity = 0,
-                                    type = Shot.Type
+                                    type = Shot.Type,
+                                    corrosivity = 1
                                 })
                             }),
                             Script.ToPlainObject(new
@@ -115,12 +131,13 @@ namespace AndresFour
                                 shot = Script.ToPlainObject(new
                                 {
                                     vX = 0,
-                                    vY = 1,
+                                    vY = 50,
                                     width = 4,
                                     height = 20,
                                     image = "#eeeeee",
                                     gravity = 0,
-                                    type = Shot.Type
+                                    type = Shot.Type,
+                                    corrosivity = 1
                                 })
                             }),
                             Script.ToPlainObject(new
@@ -133,16 +150,28 @@ namespace AndresFour
                                 shot = Script.ToPlainObject(new
                                 {
                                     vX = 0,
-                                    vY = -1,
+                                    vY = -50,
                                     width = 4,
                                     height = 20,
                                     image = "#eeeeee",
                                     gravity = 0,
-                                    type = Shot.Type
+                                    type = Shot.Type,
+                                    corrosivity = 1
                                 })
                             })
                         }),
                         name = "Main Character"
+                    }),
+                    Script.ToPlainObject(new
+                    {
+                        type = RealGameObject.Type,
+                        x = 10,
+                        y = 0,
+                        width = 50,
+                        height = 50,
+                        gravity = 5,
+                        strength = 0,
+                        image = "#ffffff"
                     }),
                     Script.ToPlainObject(new
                     {
@@ -152,7 +181,8 @@ namespace AndresFour
                         width = 1,
                         height = 500,
                         image = "#000000",
-                        gravity = 0
+                        gravity = 0,
+                        strength = 5
                     }),
                     Script.ToPlainObject(new
                     {
@@ -162,7 +192,8 @@ namespace AndresFour
                         width = 600,
                         height = 1,
                         image = "#000000",
-                        gravity = 0
+                        gravity = 0,
+                        strength = 5
                     }),
                     Script.ToPlainObject(new
                     {
@@ -172,7 +203,8 @@ namespace AndresFour
                         width = 1,
                         height = 500,
                         image = "#000000",
-                        gravity = 0
+                        gravity = 0,
+                        strength = 5
                     }),
                     Script.ToPlainObject(new
                     {
@@ -182,7 +214,8 @@ namespace AndresFour
                         width = 600,
                         height = 1,
                         image = "#000000",
-                        gravity = 0
+                        gravity = 0,
+                        strength = 5
                     })
             })
         });
