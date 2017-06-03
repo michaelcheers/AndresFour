@@ -63,7 +63,9 @@ Bridge.assembly("AndresFour", function ($asm, globals) {
                                                         if (Bridge.referenceEquals(Bridge.Reflection.getBaseType(iter), AndresFour.GameObject)) {
                                                             if (Bridge.referenceEquals(Bridge.cast(Bridge.Reflection.fieldAccess(Bridge.Reflection.getMembers(a, 4, 284, "Type"), null), System.String), type)) {
                                                                 fromType = a;
-                                                                dBreak = true;
+                                                                dBreak = true; /// Possible mistaken empty statement
+
+
                                                             } else {
                                                                 ;
                                                             }
@@ -162,155 +164,6 @@ Bridge.assembly("AndresFour", function ($asm, globals) {
         }
     });
 
-    Bridge.define("AndresFour.Level", {
-        statics: {
-            methods: {
-                Create: function (dynamic, name) {
-                    var $step = 0,
-                        $task1, 
-                        $taskResult1, 
-                        $jumpFromFinally, 
-                        $tcs = new System.Threading.Tasks.TaskCompletionSource(), 
-                        $returnValue, 
-                        children, 
-                        game, 
-                        $t, 
-                        $t1, 
-                        $t2, 
-                        item, 
-                        $async_e, 
-                        $asyncBody = Bridge.fn.bind(this, function () {
-                            try {
-                                for (;;) {
-                                    $step = System.Array.min([0,1,2,3,4], $step);
-                                    switch ($step) {
-                                        case 0: {
-                                            game = ($t=new AndresFour.Level(), $t.Children = (children = new (System.Collections.Generic.List$1(AndresFour.GameObject))()), $t.Interval = dynamic.interval, $t.DrawInterval = dynamic.drawInterval, $t.Canvas = ($t1=document.createElement('canvas'), $t1.width = dynamic.width, $t1.height = dynamic.height, $t1), $t.Down = new (System.Collections.Generic.HashSet$1(System.Int32)).ctor(), $t.Name = name, $t.Width = dynamic.width, $t.Height = dynamic.height, $t);
-                                            $t2 = Bridge.getEnumerator(Bridge.cast(dynamic.children, System.Array.type(System.Object)));
-                                            $step = 1;
-                                            continue;
-                                        }
-                                        case 1: {
-                                            if ($t2.moveNext()) {
-                                                item = $t2.Current;
-                                                $step = 2;
-                                                continue;
-                                            }
-                                            $step = 4;
-                                            continue;
-                                        }
-                                        case 2: {
-                                            $task1 = AndresFour.GameObject.Create(item);
-                                            $step = 3;
-                                            $task1.continueWith($asyncBody);
-                                            return;
-                                        }
-                                        case 3: {
-                                            $taskResult1 = $task1.getAwaitedResult();
-                                            children.add($taskResult1);
-                                            $step = 1;
-                                            continue;
-                                        }
-                                        case 4: {
-                                            $tcs.setResult(game);
-                                            return;
-                                        }
-                                        default: {
-                                            $tcs.setResult(null);
-                                            return;
-                                        }
-                                    }
-                                }
-                            } catch($async_e1) {
-                                $async_e = System.Exception.create($async_e1);
-                                $tcs.setException($async_e);
-                            }
-                        }, arguments);
-
-                    $asyncBody();
-                    return $tcs.task;
-                }
-            }
-        },
-        fields: {
-            Children: null,
-            Interval: 0,
-            DrawInterval: 0,
-            Canvas: null,
-            Down: null,
-            Name: null,
-            Width: 0,
-            Height: 0
-        },
-        methods: {
-            Start: function () {
-                document.body.onkeyup = Bridge.fn.bind(this, $asm.$.AndresFour.Level.f1);
-                document.body.onkeydown = Bridge.fn.bind(this, $asm.$.AndresFour.Level.f2);
-                Bridge.global.setInterval(Bridge.fn.cacheBind(this, this.Update), this.Interval);
-                Bridge.global.setInterval(Bridge.fn.cacheBind(this, this.Draw), this.DrawInterval);
-            },
-            toDynamic: function () {
-                return { width: this.Canvas.width, height: this.Canvas.height, interval: this.Interval, drawInterval: this.DrawInterval, children: this.Children.convertAll(System.Object, $asm.$.AndresFour.Level.f3).toArray() };
-            },
-            Draw: function () {
-                var $t;
-                var context = this.Canvas.getContext("2d");
-                context.clearRect(0, 0, this.Canvas.width, this.Canvas.height);
-                $t = Bridge.getEnumerator(this.Children);
-                try {
-                    while ($t.moveNext()) {
-                        var child = $t.Current;
-                        if (Bridge.is(child, AndresFour.DrawnGameObject)) {
-                            var drawObject = child; /// 'is' expression's given expression is never of the provided type
-
-
-                            if (Bridge.is(drawObject.Image, System.String)) {
-                                context.fillStyle = drawObject.Image;
-                                context.fillRect(drawObject.X, drawObject.Y, drawObject.Width, drawObject.Height);
-                            } else {
-                                context.drawImage(drawObject.Image, drawObject.X, drawObject.Y, drawObject.Width, drawObject.Height);
-                            }
-                            if (drawObject.Selected) {
-                                context.strokeStyle = "#4286f4";
-                                context.strokeRect(((Bridge.Int.clip32(drawObject.X) - 1) | 0), ((Bridge.Int.clip32(drawObject.Y) - 1) | 0), ((Bridge.Int.clip32(drawObject.Width) + 2) | 0), ((Bridge.Int.clip32(drawObject.Height) + 2) | 0));
-                            }
-                        }
-                    }
-                }finally {
-                    if (Bridge.is($t, System.IDisposable)) {
-                        $t.System$IDisposable$dispose();
-                    }
-                }},
-            Update: function () {
-                var $t;
-                $t = Bridge.getEnumerator(this.Children);
-                try {
-                    while ($t.moveNext()) {
-                        var child = $t.Current;
-                        child.Update(this);
-                    }
-                }finally {
-                    if (Bridge.is($t, System.IDisposable)) {
-                        $t.System$IDisposable$dispose();
-                    }
-                }}
-        }
-    });
-
-    Bridge.ns("AndresFour.Level", $asm.$);
-
-    Bridge.apply($asm.$.AndresFour.Level, {
-        f1: function (e) {
-            this.Down.remove(e.keyCode);
-        },
-        f2: function (e) {
-            this.Down.add(e.keyCode);
-        },
-        f3: function (v) {
-            return v.toDynamic();
-        }
-    });
-
     Bridge.define("AndresFour.LevelEditor", {
         statics: {
             fields: {
@@ -332,11 +185,13 @@ Bridge.assembly("AndresFour", function ($asm, globals) {
             },
             methods: {
                 Save: function () {
-                    var $t;
-                    var dynamicVal = AndresFour.LevelEditor.level.toDynamic();
-                    dynamicVal.recovery = AndresFour.LevelEditor.creation;
-                    var download = ($t=document.createElement('a'), $t.download = "level.dat", $t.href = System.String.format("data:text/plain;charset=UTF-8,{0}", Bridge.global.btoa(JSON.stringify(dynamicVal))), $t);
-                    download.click();
+                    AndresFour.LevelEditor.SaveToStorage();
+                    //HTMLAnchorElement download = new HTMLAnchorElement
+                    //{
+                    //    Download = "level.dat",
+                    //    Href = $"data:text/plain;charset=UTF-8,{Global.Btoa(JSON.Stringify(dynamicVal))}"
+                    //};
+                    //download.Click();
                 },
                 FileRead: function (fileInput) {
                     var file = fileInput.files[System.Array.index(0, fileInput.files)];
@@ -389,7 +244,11 @@ Bridge.assembly("AndresFour", function ($asm, globals) {
                     try {
                         while ($t.moveNext()) {
                             var level = $t.Current;
-                            resulting[System.Array.index(level.Name, resulting)] = level.toDynamic();
+                            var dynamicVal = level.toDynamic();
+                            if (Bridge.referenceEquals(level, AndresFour.LevelEditor.level)) {
+                                dynamicVal.recovery = AndresFour.LevelEditor.creation;
+                            }
+                            resulting[System.Array.index(level.Name, resulting)] = dynamicVal;
                         }
                     }finally {
                         if (Bridge.is($t, System.IDisposable)) {
@@ -1357,6 +1216,155 @@ Bridge.assembly("AndresFour", function ($asm, globals) {
         }
     });
 
+    Bridge.define("AndresFour.Level", {
+        inherits: [AndresFour.GameObject],
+        statics: {
+            methods: {
+                Create: function (dynamic, name) {
+                    var $step = 0,
+                        $task1, 
+                        $taskResult1, 
+                        $jumpFromFinally, 
+                        $tcs = new System.Threading.Tasks.TaskCompletionSource(), 
+                        $returnValue, 
+                        children, 
+                        game, 
+                        $t, 
+                        $t1, 
+                        $t2, 
+                        item, 
+                        $async_e, 
+                        $asyncBody = Bridge.fn.bind(this, function () {
+                            try {
+                                for (;;) {
+                                    $step = System.Array.min([0,1,2,3,4], $step);
+                                    switch ($step) {
+                                        case 0: {
+                                            game = ($t=new AndresFour.Level(), $t.Children = (children = new (System.Collections.Generic.List$1(AndresFour.GameObject))()), $t.Interval = dynamic.interval, $t.DrawInterval = dynamic.drawInterval, $t.Canvas = ($t1=document.createElement('canvas'), $t1.width = dynamic.width, $t1.height = dynamic.height, $t1), $t.Down = new (System.Collections.Generic.HashSet$1(System.Int32)).ctor(), $t.Name = name, $t.Width = dynamic.width, $t.Height = dynamic.height, $t);
+                                            $t2 = Bridge.getEnumerator(Bridge.cast(dynamic.children, System.Array.type(System.Object)));
+                                            $step = 1;
+                                            continue;
+                                        }
+                                        case 1: {
+                                            if ($t2.moveNext()) {
+                                                item = $t2.Current;
+                                                $step = 2;
+                                                continue;
+                                            }
+                                            $step = 4;
+                                            continue;
+                                        }
+                                        case 2: {
+                                            $task1 = AndresFour.GameObject.Create(item);
+                                            $step = 3;
+                                            $task1.continueWith($asyncBody);
+                                            return;
+                                        }
+                                        case 3: {
+                                            $taskResult1 = $task1.getAwaitedResult();
+                                            children.add($taskResult1);
+                                            $step = 1;
+                                            continue;
+                                        }
+                                        case 4: {
+                                            $tcs.setResult(game);
+                                            return;
+                                        }
+                                        default: {
+                                            $tcs.setResult(null);
+                                            return;
+                                        }
+                                    }
+                                }
+                            } catch($async_e1) {
+                                $async_e = System.Exception.create($async_e1);
+                                $tcs.setException($async_e);
+                            }
+                        }, arguments);
+
+                    $asyncBody();
+                    return $tcs.task;
+                }
+            }
+        },
+        fields: {
+            Children: null,
+            Interval: 0,
+            DrawInterval: 0,
+            Canvas: null,
+            Down: null,
+            Width: 0,
+            Height: 0
+        },
+        methods: {
+            Start: function () {
+                document.body.onkeyup = Bridge.fn.bind(this, $asm.$.AndresFour.Level.f1);
+                document.body.onkeydown = Bridge.fn.bind(this, $asm.$.AndresFour.Level.f2);
+                Bridge.global.setInterval(Bridge.fn.cacheBind(this, this.Update$1), this.Interval);
+                Bridge.global.setInterval(Bridge.fn.cacheBind(this, this.Draw), this.DrawInterval);
+            },
+            toDynamic: function () {
+                return { width: this.Canvas.width, height: this.Canvas.height, interval: this.Interval, drawInterval: this.DrawInterval, children: this.Children.convertAll(System.Object, $asm.$.AndresFour.Level.f3).toArray() };
+            },
+            Draw: function () {
+                var $t;
+                var context = this.Canvas.getContext("2d");
+                context.clearRect(0, 0, this.Canvas.width, this.Canvas.height);
+                $t = Bridge.getEnumerator(this.Children);
+                try {
+                    while ($t.moveNext()) {
+                        var child = $t.Current;
+                        if (Bridge.is(child, AndresFour.DrawnGameObject)) {
+                            var drawObject = child; /// 'is' expression's given expression is never of the provided type
+
+
+                            if (Bridge.is(drawObject.Image, System.String)) {
+                                context.fillStyle = drawObject.Image;
+                                context.fillRect(drawObject.X, drawObject.Y, drawObject.Width, drawObject.Height);
+                            } else {
+                                context.drawImage(drawObject.Image, drawObject.X, drawObject.Y, drawObject.Width, drawObject.Height);
+                            }
+                            if (drawObject.Selected) {
+                                context.strokeStyle = "#4286f4";
+                                context.strokeRect(((Bridge.Int.clip32(drawObject.X) - 1) | 0), ((Bridge.Int.clip32(drawObject.Y) - 1) | 0), ((Bridge.Int.clip32(drawObject.Width) + 2) | 0), ((Bridge.Int.clip32(drawObject.Height) + 2) | 0));
+                            }
+                        }
+                    }
+                }finally {
+                    if (Bridge.is($t, System.IDisposable)) {
+                        $t.System$IDisposable$dispose();
+                    }
+                }},
+            Update$1: function () {
+                var $t;
+                $t = Bridge.getEnumerator(this.Children);
+                try {
+                    while ($t.moveNext()) {
+                        var child = $t.Current;
+                        child.Update(this);
+                    }
+                }finally {
+                    if (Bridge.is($t, System.IDisposable)) {
+                        $t.System$IDisposable$dispose();
+                    }
+                }}
+        }
+    });
+
+    Bridge.ns("AndresFour.Level", $asm.$);
+
+    Bridge.apply($asm.$.AndresFour.Level, {
+        f1: function (e) {
+            this.Down.remove(e.keyCode);
+        },
+        f2: function (e) {
+            this.Down.add(e.keyCode);
+        },
+        f3: function (v) {
+            return v.toDynamic();
+        }
+    });
+
     Bridge.define("AndresFour.OnKeyEvent", {
         inherits: [AndresFour.GameObject],
         fields: {
@@ -1752,6 +1760,10 @@ Bridge.assembly("AndresFour", function ($asm, globals) {
         }
     });
 
+    Bridge.define("AndresFour.Checkpoint", {
+        inherits: [AndresFour.RealGameObject]
+    });
+
     Bridge.define("AndresFour.Shot", {
         inherits: [AndresFour.RealGameObject],
         statics: {
@@ -1815,11 +1827,12 @@ Bridge.assembly("AndresFour", function ($asm, globals) {
 
     var $m = Bridge.setMetadata,
         $n = [System.Collections.Generic,AndresFour,System.Threading.Tasks,System];
+    $m($n[1].Checkpoint, function () { return {"att":1048577,"a":2,"m":[{"a":2,"isSynthetic":true,"n":".ctor","t":1,"sn":"ctor"}]}; });
     $m($n[1].LevelEditorReference, function () { return {"att":1048577,"a":2,"m":[{"a":2,"isSynthetic":true,"n":".ctor","t":1,"sn":"ctor"},{"a":2,"n":"cells","t":4,"rt":$n[0].Dictionary$2(System.String,HTMLElement),"sn":"cells"},{"a":2,"n":"gameObject","t":4,"rt":$n[1].GameObject,"sn":"gameObject"},{"a":2,"n":"members","t":4,"rt":$n[0].Dictionary$2(System.String,System.Object),"sn":"members"}]}; });
     $m($n[1].MainStarter, function () { return {"att":1048961,"a":2,"s":true,"m":[{"a":1,"n":"FileRead","is":true,"t":8,"pi":[{"n":"fileInput","pt":HTMLInputElement,"ps":0}],"sn":"FileRead","rt":$n[2].Task$1,"p":[HTMLInputElement]},{"a":2,"n":"Main","is":true,"t":8,"sn":"Main","rt":$n[3].Object},{"a":2,"n":"Start","is":true,"t":8,"sn":"Start","rt":$n[3].Object},{"a":2,"n":"BackgroundImage","is":true,"t":4,"rt":$n[3].String,"sn":"BackgroundImage"},{"a":2,"n":"levelTemplate","is":true,"t":4,"rt":System.Object,"sn":"levelTemplate"}]}; });
     $m($n[1].Character, function () { return {"att":1048577,"a":2,"m":[{"a":2,"isSynthetic":true,"n":".ctor","t":1,"sn":"ctor"},{"ov":true,"a":2,"n":"Parse","t":8,"pi":[{"n":"dynamic","pt":System.Object,"ps":0}],"sn":"Parse","rt":$n[2].Task,"p":[System.Object]},{"ov":true,"a":2,"n":"Save","t":8,"pi":[{"n":"dynamic","pt":System.Object,"ps":0}],"sn":"Save","rt":$n[3].Object,"p":[System.Object]},{"ov":true,"a":2,"n":"Update","t":8,"pi":[{"n":"in","pt":$n[1].Level,"ps":0}],"sn":"Update","rt":$n[3].Object,"p":[$n[1].Level]},{"a":2,"n":"Type","is":true,"t":4,"rt":$n[3].String,"sn":"Type"},{"a":2,"n":"keyEvents","t":4,"rt":$n[0].List$1(AndresFour.OnKeyEvent),"sn":"keyEvents"}]}; });
     $m($n[1].DrawnGameObject, function () { return {"att":1048577,"a":2,"m":[{"a":2,"isSynthetic":true,"n":".ctor","t":1,"sn":"ctor"},{"ov":true,"a":2,"n":"Parse","t":8,"pi":[{"n":"dynamic","pt":System.Object,"ps":0}],"sn":"Parse","rt":$n[2].Task,"p":[System.Object]},{"ov":true,"a":2,"n":"Save","t":8,"pi":[{"n":"dynamic","pt":System.Object,"ps":0}],"sn":"Save","rt":$n[3].Object,"p":[System.Object]},{"a":2,"n":"Height","t":16,"rt":$n[3].Double,"g":{"a":2,"n":"get_Height","t":8,"rt":$n[3].Double,"fg":"Height"},"s":{"a":2,"n":"set_Height","t":8,"p":[$n[3].Double],"rt":$n[3].Object,"fs":"Height"},"fn":"Height"},{"a":2,"n":"Width","t":16,"rt":$n[3].Double,"g":{"a":2,"n":"get_Width","t":8,"rt":$n[3].Double,"fg":"Width"},"s":{"a":2,"n":"set_Width","t":8,"p":[$n[3].Double],"rt":$n[3].Object,"fs":"Width"},"fn":"Width"},{"a":2,"n":"X","t":16,"rt":$n[3].Double,"g":{"a":2,"n":"get_X","t":8,"rt":$n[3].Double,"fg":"X"},"s":{"a":2,"n":"set_X","t":8,"p":[$n[3].Double],"rt":$n[3].Object,"fs":"X"},"fn":"X"},{"a":2,"n":"Y","t":16,"rt":$n[3].Double,"g":{"a":2,"n":"get_Y","t":8,"rt":$n[3].Double,"fg":"Y"},"s":{"a":2,"n":"set_Y","t":8,"p":[$n[3].Double],"rt":$n[3].Object,"fs":"Y"},"fn":"Y"},{"a":2,"n":"Image","t":4,"rt":System.Object,"sn":"Image"},{"a":2,"n":"Position","t":4,"rt":$n[1].Rectangle,"sn":"Position"},{"a":4,"n":"Selected","t":4,"rt":$n[3].Boolean,"sn":"Selected"},{"a":2,"n":"Type","is":true,"t":4,"rt":$n[3].String,"sn":"Type"}]}; });
-    $m($n[1].Level, function () { return {"att":1048577,"a":2,"m":[{"a":2,"isSynthetic":true,"n":".ctor","t":1,"sn":"ctor"},{"a":2,"n":"Create","is":true,"t":8,"pi":[{"n":"dynamic","pt":System.Object,"ps":0},{"n":"name","pt":$n[3].String,"ps":1}],"sn":"Create","rt":$n[2].Task$1,"p":[System.Object,$n[3].String]},{"a":2,"n":"Draw","t":8,"sn":"Draw","rt":$n[3].Object},{"a":2,"n":"Start","t":8,"sn":"Start","rt":$n[3].Object},{"ov":true,"a":2,"n":"ToDynamic","t":8,"sn":"toDynamic","rt":System.Object},{"a":2,"n":"Update","t":8,"sn":"Update","rt":$n[3].Object},{"a":2,"n":"Canvas","t":4,"rt":HTMLCanvasElement,"sn":"Canvas"},{"a":2,"n":"Children","t":4,"rt":$n[0].List$1(AndresFour.GameObject),"sn":"Children"},{"a":2,"n":"Down","t":4,"rt":$n[0].HashSet$1(System.Int32),"sn":"Down"},{"a":2,"n":"DrawInterval","t":4,"rt":$n[3].Int32,"sn":"DrawInterval"},{"a":2,"n":"Height","t":4,"rt":$n[3].Double,"sn":"Height"},{"a":2,"n":"Interval","t":4,"rt":$n[3].Int32,"sn":"Interval"},{"a":2,"n":"Name","t":4,"rt":$n[3].String,"sn":"Name"},{"a":2,"n":"Width","t":4,"rt":$n[3].Double,"sn":"Width"}]}; });
+    $m($n[1].Level, function () { return {"att":1048577,"a":2,"m":[{"a":2,"isSynthetic":true,"n":".ctor","t":1,"sn":"ctor"},{"a":2,"n":"Create","is":true,"t":8,"pi":[{"n":"dynamic","pt":System.Object,"ps":0},{"n":"name","pt":$n[3].String,"ps":1}],"sn":"Create","rt":$n[2].Task$1,"p":[System.Object,$n[3].String]},{"a":2,"n":"Draw","t":8,"sn":"Draw","rt":$n[3].Object},{"a":2,"n":"Start","t":8,"sn":"Start","rt":$n[3].Object},{"ov":true,"a":2,"n":"ToDynamic","t":8,"sn":"toDynamic","rt":System.Object},{"a":2,"n":"Update","t":8,"sn":"Update$1","rt":$n[3].Object},{"a":2,"n":"Canvas","t":4,"rt":HTMLCanvasElement,"sn":"Canvas"},{"a":2,"n":"Children","t":4,"rt":$n[0].List$1(AndresFour.GameObject),"sn":"Children"},{"a":2,"n":"Down","t":4,"rt":$n[0].HashSet$1(System.Int32),"sn":"Down"},{"a":2,"n":"DrawInterval","t":4,"rt":$n[3].Int32,"sn":"DrawInterval"},{"a":2,"n":"Height","t":4,"rt":$n[3].Double,"sn":"Height"},{"a":2,"n":"Interval","t":4,"rt":$n[3].Int32,"sn":"Interval"},{"a":2,"n":"Width","t":4,"rt":$n[3].Double,"sn":"Width"}]}; });
     $m($n[1].GameObject, function () { return {"att":1048705,"a":2,"m":[{"a":3,"isSynthetic":true,"n":".ctor","t":1,"sn":"ctor"},{"a":2,"n":"Create","is":true,"t":8,"pi":[{"n":"dynamic","pt":System.Object,"ps":0}],"sn":"Create","rt":$n[2].Task$1,"p":[System.Object]},{"v":true,"a":2,"n":"Parse","t":8,"pi":[{"n":"dynamic","pt":System.Object,"ps":0}],"sn":"Parse","rt":$n[2].Task,"p":[System.Object]},{"v":true,"a":2,"n":"Save","t":8,"pi":[{"n":"dynamic","pt":System.Object,"ps":0}],"sn":"Save","rt":$n[3].Object,"p":[System.Object]},{"ov":true,"a":2,"n":"ToDynamic","t":8,"sn":"toDynamic","rt":System.Object},{"v":true,"a":2,"n":"Update","t":8,"pi":[{"n":"in","pt":$n[1].Level,"ps":0}],"sn":"Update","rt":$n[3].Object,"p":[$n[1].Level]},{"a":2,"n":"Name","t":4,"rt":$n[3].String,"sn":"Name"}]}; });
     $m($n[1].BridgeEssentials, function () { return {"att":1048961,"a":2,"s":true,"m":[{"a":2,"n":"LoadImage","is":true,"t":8,"pi":[{"n":"value","pt":$n[3].String,"ps":0}],"sn":"LoadImage","rt":$n[2].Task$1,"p":[$n[3].String]}]}; });
     $m($n[1].Movement, function () { return {"att":1048577,"a":2,"m":[{"a":2,"isSynthetic":true,"n":".ctor","t":1,"sn":"ctor"},{"ov":true,"a":2,"n":"Parse","t":8,"pi":[{"n":"dynamic","pt":System.Object,"ps":0}],"sn":"Parse","rt":$n[2].Task,"p":[System.Object]},{"ov":true,"a":2,"n":"Save","t":8,"pi":[{"n":"dynamic","pt":System.Object,"ps":0}],"sn":"Save","rt":$n[3].Object,"p":[System.Object]},{"a":2,"n":"Type","is":true,"t":4,"rt":$n[3].String,"sn":"Type"},{"a":2,"n":"Velocity","t":4,"rt":$n[1].Vector2,"sn":"Velocity"},{"a":2,"n":"VelocityBased","t":4,"rt":$n[3].Boolean,"sn":"VelocityBased"}]}; });

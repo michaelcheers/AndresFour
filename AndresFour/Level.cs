@@ -9,14 +9,13 @@ using System.Runtime.CompilerServices;
 
 namespace AndresFour
 {
-    public class Level
+    public class Level : GameObject
     {
         public List<GameObject> Children;
         public int Interval;
         public int DrawInterval;
         public HTMLCanvasElement Canvas;
         public HashSet<int> Down;
-        public string Name;
         public double Width;
         public double Height;
         public static async Task<Level> Create(dynamic @dynamic, string name)

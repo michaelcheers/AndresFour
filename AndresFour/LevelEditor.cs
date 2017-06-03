@@ -19,14 +19,13 @@ namespace AndresFour
 
         static void Save ()
         {
-            var dynamicVal = level.ToDynamic();
-            dynamicVal.recovery = creation;
-            HTMLAnchorElement download = new HTMLAnchorElement
-            {
-                Download = "level.dat",
-                Href = $"data:text/plain;charset=UTF-8,{Global.Btoa(JSON.Stringify(dynamicVal))}"
-            };
-            download.Click();
+            SaveToStorage();
+            //HTMLAnchorElement download = new HTMLAnchorElement
+            //{
+            //    Download = "level.dat",
+            //    Href = $"data:text/plain;charset=UTF-8,{Global.Btoa(JSON.Stringify(dynamicVal))}"
+            //};
+            //download.Click();
         }
 
         static Task<string> FileRead (HTMLInputElement fileInput)
@@ -54,7 +53,12 @@ namespace AndresFour
         {
             dynamic resulting = new object();
             foreach (var level in levels)
-                resulting[level.Name] = level.ToDynamic();
+            {
+                var dynamicVal = level.ToDynamic();
+                if (level == LevelEditor.level)
+                    dynamicVal.recovery = creation;
+                resulting[level.Name] = dynamicVal;
+            }
             Global.LocalStorage.SetItem("levels", JSON.Stringify(resulting));
         }
 

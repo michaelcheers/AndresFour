@@ -50,7 +50,10 @@ namespace AndresFour
                         {
                             fromType = a;
                             dBreak = true;
-                        } else;
+#pragma warning disable CS0642 // Possible mistaken empty statement
+                        }
+                        else;
+#pragma warning restore CS0642 // Possible mistaken empty statement
                     else if (iter.BaseType != typeof(object))
                     {
                         iter = iter.BaseType;
