@@ -261,3 +261,5 @@ __pycache__/
 *.pyc
 AndresFour/AndresFour.min.js
 AndresFour/bridge.min.js
+AndresFour/bridge.console.min.js
+AndresFour/bridge.collections.min.js
