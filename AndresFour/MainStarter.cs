@@ -222,6 +222,8 @@ namespace AndresFour
             })
         });
 
+        public const int FileVersion = 2;
+
         public static async void Main ()
         {
             var list = new HTMLUListElement();
@@ -229,6 +231,19 @@ namespace AndresFour
             {
                 Global.LocalStorage.Clear();
                 Global.LocalStorage.SetItem("levels", "[]");
+                Global.LocalStorage.SetItem("v", FileVersion.ToString());
+            }
+            int version = int.Parse(Global.LocalStorage.GetItem("v").As<string>() ?? "0");
+            if (version != FileVersion)
+            {
+                if (Global.Confirm($"Program version is {FileVersion}, your local files have version {version}, this program will almost certainly not work if you do not clear this game's data (your data should still be recoverable). Would you like to do so?"))
+                {
+                    Global.LocalStorage.SetItem("oldS", JSON.Stringify(Global.LocalStorage));
+                    Global.LocalStorage.SetItem("levels", "[]");
+                    Global.LocalStorage.SetItem("v", FileVersion.ToString());
+                }
+                Global.LocalStorage.SetItem("levels", "[]");
+                Global.LocalStorage.SetItem("v", FileVersion.ToString());
             }
             LevelEditor.levels = new List<Level>();
             await LevelEditor.LoadFromStorage();
