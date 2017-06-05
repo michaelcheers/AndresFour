@@ -40,7 +40,7 @@ namespace AndresFour
 
         public static async void CreateLevel ()
         {
-            var level = await Level.Create(MainStarter.levelTemplate, "Untitled");
+            var level = await Level.Create((object)MainStarter.levelTemplate, "Untitled");
             levels.Add(level);
             LevelEditor.level = level;
             SelectLevel(level);

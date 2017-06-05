@@ -18,6 +18,7 @@ namespace AndresFour
         public HashSet<int> Down;
         public double Width;
         public double Height;
+        public const string Type = "level";
         public static async Task<Level> Create(dynamic @dynamic, string name)
         {
             List<GameObject> children;

@@ -38,6 +38,8 @@ namespace AndresFour
             Type fromType = null;
             foreach (var a in typeof(GameObject).Assembly.GetTypes())
             {
+                if (Bridge.Html5.Global.ToDynamic().Bridge.getMetadata(a) == Bridge.Html5.Global.Undefined)
+                    continue;
                 if (a.IsAbstract)
                     continue;
                 var iter = a;
