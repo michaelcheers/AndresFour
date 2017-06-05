@@ -27,6 +27,8 @@ namespace AndresFour
             drawInterval = 1000 / 60,
             width = 600,
             height = 500,
+            name = "Untitled",
+            type = Level.Type,
             children = /*Script.ToPlainObject*/(new object[]
             {
                     Script.ToPlainObject(new
@@ -226,7 +228,7 @@ namespace AndresFour
             if (!Global.LocalStorage.HasOwnProperty("levels"))
             {
                 Global.LocalStorage.Clear();
-                Global.LocalStorage.SetItem("levels", "{}");
+                Global.LocalStorage.SetItem("levels", "[]");
             }
             LevelEditor.levels = new List<Level>();
             await LevelEditor.LoadFromStorage();

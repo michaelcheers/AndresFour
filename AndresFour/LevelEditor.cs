@@ -40,7 +40,7 @@ namespace AndresFour
 
         public static async void CreateLevel ()
         {
-            var level = await Level.Create((object)MainStarter.levelTemplate, "Untitled");
+            var level = (Level)(await Level.Create((object)MainStarter.levelTemplate));
             levels.Add(level);
             LevelEditor.level = level;
             SelectLevel(level);
@@ -51,13 +51,13 @@ namespace AndresFour
 
         public static void SaveToStorage ()
         {
-            dynamic resulting = new object();
+            dynamic[] resulting = new dynamic[] { };
             foreach (var level in levels)
             {
                 var dynamicVal = level.ToDynamic();
                 if (level == LevelEditor.level)
                     dynamicVal.recovery = creation;
-                resulting[level.Name] = dynamicVal;
+                resulting.Push((object)dynamicVal);
             }
             Global.LocalStorage.SetItem("levels", JSON.Stringify(resulting));
         }
@@ -66,11 +66,8 @@ namespace AndresFour
         {
             levels.Clear();
             dynamic dStorage = JSON.Parse(Global.LocalStorage.GetItem("levels").As<string>());
-            foreach (var key in Object.Keys(dStorage))
-            {
-                Level level = await Level.Create(dStorage[key], key);
-                levels.Add(level);
-            }
+            foreach (var stItem in (object[])dStorage)
+                levels.Add((Level)(await Level.Create(stItem)));
         }
 
         static dynamic creation;

@@ -19,28 +19,43 @@ namespace AndresFour
         public double Width;
         public double Height;
         public const string Type = "level";
-        public static async Task<Level> Create(dynamic @dynamic, string name)
+        public override async Task Parse(dynamic dynamic)
         {
-            List<GameObject> children;
-            Level game = new Level
+            Children = new List<GameObject>();
+            Interval = dynamic.interval;
+            DrawInterval = dynamic.drawInterval;
+            Canvas = new HTMLCanvasElement
             {
-                Children = children = new List<GameObject>(),
-                Interval = @dynamic.interval,
-                DrawInterval = @dynamic.drawInterval,
-                Canvas = new HTMLCanvasElement
-                {
-                    Width = @dynamic.width,
-                    Height = @dynamic.height
-                },
-                Down = new HashSet<int>(),
-                Name = name,
-                Width = @dynamic.width,
-                Height = @dynamic.height
+                Width = (int)(Width = dynamic.width),
+                Height = (int)(Height = dynamic.height)
             };
+            Down = new HashSet<int>();
             foreach (var item in (dynamic[])@dynamic.children)
-                children.Add(await GameObject.Create(item));
-            return game;
+                Children.Add(await GameObject.Create(item));
+            await base.Parse((object)dynamic);
         }
+        //public static async Task<Level> Create(dynamic @dynamic, string name)
+        //{
+        //    List<GameObject> children;
+        //    Level game = new Level
+        //    {
+        //        Children = children = new List<GameObject>(),
+        //        Interval = @dynamic.interval,
+        //        DrawInterval = @dynamic.drawInterval,
+        //        Canvas = new HTMLCanvasElement
+        //        {
+        //            Width = @dynamic.width,
+        //            Height = @dynamic.height
+        //        },
+        //        Down = new HashSet<int>(),
+        //        Name = name,
+        //        Width = @dynamic.width,
+        //        Height = @dynamic.height
+        //    };
+        //    foreach (var item in (dynamic[])@dynamic.children)
+        //        children.Add(await GameObject.Create(item));
+        //    return game;
+        //}
         public void Start ()
         {
             Document.Body.OnKeyUp = e => Down.Remove(e.KeyCode);
@@ -48,15 +63,24 @@ namespace AndresFour
             Global.SetInterval(Update, Interval);
             Global.SetInterval(Draw, DrawInterval);
         }
-        public override dynamic ToDynamic() =>
-            Script.ToPlainObject(new
-            {
-                width = Canvas.Width,
-                height = Canvas.Height,
-                interval = Interval,
-                drawInterval = DrawInterval,
-                children = Children.ConvertAll(v => v.ToDynamic()).ToArray()
-            });
+        //public override dynamic ToDynamic() =>
+        //    Script.ToPlainObject(new
+        //    {
+        //        width = Canvas.Width,
+        //        height = Canvas.Height,
+        //        interval = Interval,
+        //        drawInterval = DrawInterval,
+        //        children = Children.ConvertAll(v => v.ToDynamic()).ToArray()
+        //    });
+        public override void Save(dynamic dynamic)
+        {
+            dynamic.width = Canvas.Width;
+            dynamic.height = Canvas.Height;
+            dynamic.interval = Interval;
+            dynamic.drawInterval = DrawInterval;
+            dynamic.children = Children.ConvertAll(v => v.ToDynamic()).ToArray();
+            base.Save((object)dynamic);
+        }
         public void Draw ()
         {
             var context = Canvas.GetContext(CanvasTypes.CanvasContext2DType.CanvasRenderingContext2D);
