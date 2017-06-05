@@ -1771,10 +1771,6 @@ Bridge.assembly("AndresFour", function ($asm, globals) {
         }
     });
 
-    Bridge.define("AndresFour.Checkpoint", {
-        inherits: [AndresFour.RealGameObject]
-    });
-
     Bridge.define("AndresFour.Shot", {
         inherits: [AndresFour.RealGameObject],
         statics: {
@@ -1838,7 +1834,6 @@ Bridge.assembly("AndresFour", function ($asm, globals) {
 
     var $m = Bridge.setMetadata,
         $n = [System.Collections.Generic,AndresFour,System.Threading.Tasks,System];
-    $m($n[1].Checkpoint, function () { return {"att":1048577,"a":2,"m":[{"a":2,"isSynthetic":true,"n":".ctor","t":1,"sn":"ctor"}]}; });
     $m($n[1].LevelEditorReference, function () { return {"att":1048577,"a":2,"m":[{"a":2,"isSynthetic":true,"n":".ctor","t":1,"sn":"ctor"},{"a":2,"n":"cells","t":4,"rt":$n[0].Dictionary$2(System.String,HTMLElement),"sn":"cells"},{"a":2,"n":"gameObject","t":4,"rt":$n[1].GameObject,"sn":"gameObject"},{"a":2,"n":"members","t":4,"rt":$n[0].Dictionary$2(System.String,System.Object),"sn":"members"}]}; });
     $m($n[1].MainStarter, function () { return {"att":1048961,"a":2,"s":true,"m":[{"a":1,"n":"FileRead","is":true,"t":8,"pi":[{"n":"fileInput","pt":HTMLInputElement,"ps":0}],"sn":"FileRead","rt":$n[2].Task$1,"p":[HTMLInputElement]},{"a":2,"n":"Main","is":true,"t":8,"sn":"Main","rt":$n[3].Object},{"a":2,"n":"Start","is":true,"t":8,"sn":"Start","rt":$n[3].Object},{"a":2,"n":"BackgroundImage","is":true,"t":4,"rt":$n[3].String,"sn":"BackgroundImage"},{"a":2,"n":"levelTemplate","is":true,"t":4,"rt":System.Object,"sn":"levelTemplate"}]}; });
     $m($n[1].Character, function () { return {"att":1048577,"a":2,"m":[{"a":2,"isSynthetic":true,"n":".ctor","t":1,"sn":"ctor"},{"ov":true,"a":2,"n":"Parse","t":8,"pi":[{"n":"dynamic","pt":System.Object,"ps":0}],"sn":"Parse","rt":$n[2].Task,"p":[System.Object]},{"ov":true,"a":2,"n":"Save","t":8,"pi":[{"n":"dynamic","pt":System.Object,"ps":0}],"sn":"Save","rt":$n[3].Object,"p":[System.Object]},{"ov":true,"a":2,"n":"Update","t":8,"pi":[{"n":"in","pt":$n[1].Level,"ps":0}],"sn":"Update","rt":$n[3].Object,"p":[$n[1].Level]},{"a":2,"n":"Type","is":true,"t":4,"rt":$n[3].String,"sn":"Type"},{"a":2,"n":"keyEvents","t":4,"rt":$n[0].List$1(AndresFour.OnKeyEvent),"sn":"keyEvents"}]}; });
