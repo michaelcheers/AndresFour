@@ -120,18 +120,14 @@ namespace AndresFour
         public bool TryMove (Level @in, Vector2 velocity)
         {
             if (velocity.X != 0 && velocity.Y != 0)
-            {
-                bool canMove = true;
-                canMove = TryMove(@in, new Vector2
-                {
-                    X = velocity.X
-                }) ? canMove : false;
-                canMove = TryMove(@in, new Vector2
-                {
-                    Y = velocity.Y
-                }) ? canMove : false;
-                return canMove;
-            }
+                return TryMove(@in, new Vector2
+                       {
+                           X = velocity.X
+                       }) &&
+                       TryMove(@in, new Vector2
+                       {
+                           Y = velocity.Y
+                       });
             if (velocity.X != 0)
                 return TryMove(@in, Position.Y, ref Position.X, Position.Height, Position.Width, velocity.X, v => v.X, v => v.Width);
             if (velocity.Y != 0)

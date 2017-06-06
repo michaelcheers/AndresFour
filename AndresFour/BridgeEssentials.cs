@@ -15,7 +15,7 @@ namespace AndresFour
             {
                 Src = value
             };
-            TaskCompletionSource<HTMLImageElement> task = new TaskCompletionSource<HTMLImageElement>();
+            var task = new TaskCompletionSource<HTMLImageElement>();
             image.OnLoad = e => task.SetResult(image);
             return task.Task;
         }

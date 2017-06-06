@@ -486,6 +486,8 @@ Bridge.assembly("AndresFour", function ($asm, globals) {
                         field, 
                         memberType, 
                         customAttributes2, 
+                        s, 
+                        o, 
                         value, 
                         contentEditable, 
                         valueString, 
@@ -635,8 +637,9 @@ Bridge.assembly("AndresFour", function ($asm, globals) {
                                             row = document.createElement('tr');
                                             AndresFour.LevelEditor.Indent(row, indent);
                                             contentEditable = "true";
-                                            if (Bridge.is(value, System.String)) {
-                                                valueString = Bridge.cast(value, System.String);
+                                            s = Bridge.as(value, System.String);
+                                            if (s != null) {
+                                                valueString = s;
                                             } else {
                                                 if (Bridge.is(value, System.Double)) {
                                                     valueString = System.Double.format(System.Nullable.getValue(Bridge.cast(Bridge.unbox(value), System.Double)), 'G');
@@ -703,7 +706,8 @@ Bridge.assembly("AndresFour", function ($asm, globals) {
                                         }
 
                                         case 12: {
-                                            if (Bridge.is(value, AndresFour.GameObject)) {
+                                            o = Bridge.as(value, AndresFour.GameObject);
+                                            if (o != null) {
                                                 $step = 13;
                                                 continue;
                                             } 
@@ -711,7 +715,7 @@ Bridge.assembly("AndresFour", function ($asm, globals) {
                                             continue;
                                         }
                                         case 13: {
-                                            $task3 = AndresFour.LevelEditor.CreateReference(Bridge.cast(value, AndresFour.GameObject), table, ((indent + 1) | 0));
+                                            $task3 = AndresFour.LevelEditor.CreateReference(o, table, ((indent + 1) | 0));
                                             $step = 14;
                                             $task3.continueWith($asyncBody);
                                             return;
@@ -1723,10 +1727,7 @@ Bridge.assembly("AndresFour", function ($asm, globals) {
             TryMove: function ($in, velocity) {
                 var $t, $t1;
                 if (velocity.X !== 0 && velocity.Y !== 0) {
-                    var canMove = true;
-                    canMove = this.TryMove($in, ($t=new AndresFour.Vector2(), $t.X = velocity.X, $t)) ? canMove : false;
-                    canMove = this.TryMove($in, ($t1=new AndresFour.Vector2(), $t1.Y = velocity.Y, $t1)) ? canMove : false;
-                    return canMove;
+                    return this.TryMove($in, ($t=new AndresFour.Vector2(), $t.X = velocity.X, $t)) && this.TryMove($in, ($t1=new AndresFour.Vector2(), $t1.Y = velocity.Y, $t1));
                 }
                 if (velocity.X !== 0) {
                     return this.TryMove$1($in, this.Position.Y, Bridge.ref(this.Position, "X"), this.Position.Height, this.Position.Width, velocity.X, $asm.$.AndresFour.RealGameObject.f1, $asm.$.AndresFour.RealGameObject.f2);

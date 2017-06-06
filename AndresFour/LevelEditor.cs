@@ -252,6 +252,8 @@ namespace AndresFour
                 else
                     throw new Exception();
                 var customAttributes2 = (ObjectCreatorAttribute[])field.GetCustomAttributes(typeof(ObjectCreatorAttribute));
+                string s;
+                GameObject o;
                 if (allowed.Contains(memberType) || customAttributes2.Length == 1)
                 {
                     object value;
@@ -269,8 +271,9 @@ namespace AndresFour
                     row.Indent(indent);
                     var contentEditable = ContentEditable.True;
                     string valueString;
-                    if (value is string)
-                        valueString = (string)value;
+                    s = value as string;
+                    if (s != null)
+                        valueString = s;
                     else if (value is double)
                         valueString = ((double)value).ToString();
                     else
@@ -306,8 +309,9 @@ namespace AndresFour
                     if (value is List<GameObject> || value is List<OnKeyEvent>)
                         foreach (GameObject _gameObject in (System.Collections.IList)(value as List<GameObject>) ?? (System.Collections.IList)(value as List<OnKeyEvent>))
                             await CreateReference(_gameObject, table, indent + 1);
-                    if (value is GameObject)
-                        await CreateReference((GameObject)value, table, indent + 1);
+                    o = value as GameObject;
+                    if (o != null)
+                        await CreateReference(o, table, indent + 1);
                 }
             }
             row = new HTMLTableRowElement();
