@@ -9,6 +9,7 @@ namespace AndresFour
     public class Shoot_OnKey : OnKeyEvent
     {
         public const string Type = "shoot on key";
+        [ObjectCreator]
         public dynamic CreateShot;
 
         public override Task Parse(dynamic dynamic)

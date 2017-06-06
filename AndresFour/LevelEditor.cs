@@ -168,8 +168,40 @@ namespace AndresFour
             row1.AppendChild(cell1);
         }
 
-        public static LevelEditorReference CreateReference (GameObject gameObject, out HTMLTableElement outTable)
+        static void Indent (this HTMLTableRowElement row, int indent)
         {
+            for (int n = 0; n < indent; n++)
+            {
+                var cell = new HTMLTableDataCellElement();
+                cell.Style.BorderRight = "1px solid black";
+                row.AppendChild(cell);
+            }
+        }
+
+        public static async Task<LevelEditorReference> CreateReference (GameObject gameObject, HTMLTableElement table, int indent = 0)
+        {
+            if (gameObject.Name == null)
+                return null;
+            HTMLTableRowElement row = new HTMLTableRowElement();
+            row.Indent(indent);
+            var cell = new HTMLTableDataCellElement();
+            cell.Style.BorderBottom = "1px solid black";
+            cell.AppendChild(new HTMLAnchorElement
+            {
+                InnerHTML = gameObject.Name,
+                Href = "javascript:void(0)",
+                OnClick = v => Select(gameObject)
+            });
+            cell.AppendChild(new Text(" "));
+            var cross = new HTMLAnchorElement
+            {
+                OnClick = v => Remove(gameObject),
+                Href = "javascript:void(0)"
+            };
+            cross.AppendChild(LevelEditor.cross = LevelEditor.cross.CloneNode().As<HTMLImageElement>());
+            cell.AppendChild(cross);
+            row.AppendChild(cell);
+            table.AppendChild(row);
             LevelEditorReference result = new LevelEditorReference
             {
                 gameObject = gameObject,
@@ -179,15 +211,23 @@ namespace AndresFour
             string type;
             if (gameObject is Character)
                 type = "Character";
+            else if (gameObject is Shot)
+                type = "Shot";
             else if (gameObject is RealGameObject)
                 type = "Real Thing";
             else if (gameObject is DrawnGameObject)
                 type = "Illusion";
+            else if (gameObject is Movement)
+                type = "Movement by User";
+            else if (gameObject is Shoot_OnKey)
+                type = "Shooting by User";
+            else if (gameObject is Level)
+                type = "Level";
             else
                 throw new Exception($"Type not allowed: {gameObject.GetType().FullName}");
-            HTMLTableElement table = new HTMLTableElement();
-            HTMLTableRowElement row = new HTMLTableRowElement();
-            HTMLTableDataCellElement cell = new HTMLTableDataCellElement
+            row = new HTMLTableRowElement();
+            row.Indent(indent);
+            cell = new HTMLTableDataCellElement
             {
                 InnerHTML = "Type"
             };
@@ -211,7 +251,8 @@ namespace AndresFour
                     memberType = ((PropertyInfo)field).PropertyType;
                 else
                     throw new Exception();
-                if (allowed.Contains(memberType))
+                var customAttributes2 = (ObjectCreatorAttribute[])field.GetCustomAttributes(typeof(ObjectCreatorAttribute));
+                if (allowed.Contains(memberType) || customAttributes2.Length == 1)
                 {
                     object value;
                     if (field is FieldInfo)
@@ -220,17 +261,32 @@ namespace AndresFour
                         value = ((PropertyInfo)field).GetValue(gameObject);
                     else
                         throw new Exception();
+                    if (value == null)
+                        continue;
+                    if (customAttributes2.Length == 1)
+                        value = await GameObject.Create(value);
                     row = new HTMLTableRowElement();
+                    row.Indent(indent);
                     string valueString;
                     if (value is string)
                         valueString = (string)value;
                     else if (value is double)
                         valueString = ((double)value).ToString();
+                    else if (value is List<GameObject>)
+                        valueString = "List of Objects";
+                    else if (value is List<OnKeyEvent>)
+                        valueString = "List of Key Press Actions";
+                    else if (value is GameObject)
+                        valueString = "Object";
                     else
                         throw new Exception();
+                    string name = field.Name;
+                    var customAttributes = (LevelEditorNameAttribute[])field.GetCustomAttributes(typeof(LevelEditorNameAttribute));
+                    if (customAttributes.Length == 1)
+                        name = customAttributes[0].LevelEditorName;
                     cell = new HTMLTableDataCellElement
                     {
-                        InnerHTML = field.Name
+                        InnerHTML = name
                     };
                     cell2 = new HTMLTableDataCellElement
                     {
@@ -242,9 +298,15 @@ namespace AndresFour
                     row.AppendChild(cell);
                     row.AppendChild(cell2);
                     table.AppendChild(row);
+                    if (value is List<GameObject> || value is List<OnKeyEvent>)
+                        foreach (GameObject _gameObject in (System.Collections.IList)(value as List<GameObject>) ?? (System.Collections.IList)(value as List<OnKeyEvent>))
+                            await CreateReference(_gameObject, table, indent + 1);
+                    if (value is GameObject)
+                        await CreateReference((GameObject)value, table, indent + 1);
                 }
             }
             row = new HTMLTableRowElement();
+            row.Indent(indent);
             cell = new HTMLTableDataCellElement();
             cell.AppendChild(new HTMLButtonElement
             {
@@ -253,11 +315,10 @@ namespace AndresFour
             });
             row.AppendChild(cell);
             table.AppendChild(row);
-            outTable = table;
             return result;
         }
 
-        static readonly Type[] allowed = { typeof(string), typeof(double)};
+        static readonly Type[] allowed = { typeof(string), typeof(double), typeof(List<GameObject>), typeof(List<OnKeyEvent>), typeof(GameObject)};
 
         public static void SaveChanges (LevelEditorReference reference)
         {
@@ -373,35 +434,15 @@ namespace AndresFour
                 OnClick = e => Select(null),
                 InnerHTML = "Unselect"
             });
-            foreach (var gameObject in level.Children)
-            {
-                if (string.IsNullOrEmpty(gameObject.Name))
-                    continue;
-                HTMLTableRowElement row = new HTMLTableRowElement();
-                var cell = new HTMLTableDataCellElement();
-                cell.Style.BorderBottom = "1px solid black";
-                cell.AppendChild(new HTMLAnchorElement
-                {
-                    InnerHTML = gameObject.Name,
-                    Href = "javascript:void(0)",
-                    OnClick = v => Select(gameObject)
-                });
-                cell.AppendChild(new Text(" "));
-                var cross = new HTMLAnchorElement
-                {
-                    OnClick = v => Remove(gameObject),
-                    Href = "javascript:void(0)"
-                };
-                cross.AppendChild(LevelEditor.cross = LevelEditor.cross.CloneNode().As<HTMLImageElement>());
-                cell.AppendChild(cross);
-                cell.AppendChild(new HTMLBRElement());
-                HTMLTableElement tableNested;
-                var reference = CreateReference(gameObject, out tableNested);
-                cell.AppendChild(tableNested);
-                row.AppendChild(cell);
-                table.AppendChild(row);
-            }
+            Refresh(gameObject: level, table: table);
             level.Draw();
+        }
+
+        static void Refresh (HTMLTableElement table, GameObject gameObject)
+        {
+            if (string.IsNullOrEmpty(gameObject.Name))
+                return;
+            CreateReference(gameObject, table);
         }
 
         static GameObject selected;

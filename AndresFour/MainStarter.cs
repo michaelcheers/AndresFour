@@ -61,7 +61,8 @@ namespace AndresFour
                                 x = 1,
                                 y = 0,
                                 type = Movement.Type,
-                                velox = false
+                                velox = false,
+                                name = "Right Movement"
                             }),
                             Script.ToPlainObject(new
                             {
@@ -72,7 +73,8 @@ namespace AndresFour
                                 x = -1,
                                 y = 0,
                                 type = Movement.Type,
-                                velox = false
+                                velox = false,
+                                name = "Left Movement"
                             }),
                             Script.ToPlainObject(new
                             {
@@ -83,7 +85,8 @@ namespace AndresFour
                                 x = 0,
                                 y = -50,
                                 type = Movement.Type,
-                                velox = true
+                                velox = true,
+                                name = "Jump Movement"
                             }),
                             Script.ToPlainObject(new
                             {
@@ -101,8 +104,11 @@ namespace AndresFour
                                     image = "#eeeeee",
                                     gravity = 0,
                                     type = Shot.Type,
-                                    corrosivity = 1
-                                })
+                                    corrosivity = 1,
+                                    name = "Right Shot",
+                                    strength = 5
+                                }),
+                                name = "Shoot Right"
                             }),
                             Script.ToPlainObject(new
                             {
@@ -120,8 +126,11 @@ namespace AndresFour
                                     image = "#eeeeee",
                                     gravity = 0,
                                     type = Shot.Type,
-                                    corrosivity = 1
-                                })
+                                    corrosivity = 1,
+                                    name = "Left Shot",
+                                    strength = 5
+                                }),
+                                name = "Shoot Left"
                             }),
                             Script.ToPlainObject(new
                             {
@@ -139,8 +148,11 @@ namespace AndresFour
                                     image = "#eeeeee",
                                     gravity = 0,
                                     type = Shot.Type,
-                                    corrosivity = 1
-                                })
+                                    corrosivity = 1,
+                                    name = "Down Shot",
+                                    strength = 5
+                                }),
+                                name = "Shoot Down"
                             }),
                             Script.ToPlainObject(new
                             {
@@ -158,8 +170,11 @@ namespace AndresFour
                                     image = "#eeeeee",
                                     gravity = 0,
                                     type = Shot.Type,
-                                    corrosivity = 1
-                                })
+                                    corrosivity = 1,
+                                    name = "Up Shot",
+                                    strength = 5
+                                }),
+                                name = "Shoot Up"
                             })
                         }),
                         name = "Main Character"
@@ -242,8 +257,6 @@ namespace AndresFour
                     Global.LocalStorage.SetItem("levels", "[]");
                     Global.LocalStorage.SetItem("v", FileVersion.ToString());
                 }
-                Global.LocalStorage.SetItem("levels", "[]");
-                Global.LocalStorage.SetItem("v", FileVersion.ToString());
             }
             LevelEditor.levels = new List<Level>();
             await LevelEditor.LoadFromStorage();

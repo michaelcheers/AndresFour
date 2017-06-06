@@ -16,8 +16,28 @@ namespace AndresFour
         public int DrawInterval;
         public HTMLCanvasElement Canvas;
         public HashSet<int> Down;
-        public double Width;
-        public double Height;
+        public double Width
+        {
+            get
+            {
+                return Canvas.Width;
+            }
+            set
+            {
+                Canvas.Width = (int)value;
+            }
+        }
+        public double Height
+        {
+            get
+            {
+                return Canvas.Height;
+            }
+            set
+            {
+                Canvas.Height = (int)value;
+            }
+        }
         public const string Type = "level";
         public override async Task Parse(dynamic dynamic)
         {
@@ -26,8 +46,8 @@ namespace AndresFour
             DrawInterval = dynamic.drawInterval;
             Canvas = new HTMLCanvasElement
             {
-                Width = (int)(Width = dynamic.width),
-                Height = (int)(Height = dynamic.height)
+                Width = dynamic.width,
+                Height = dynamic.height
             };
             Down = new HashSet<int>();
             foreach (var item in (dynamic[])@dynamic.children)

@@ -11,6 +11,7 @@ namespace AndresFour
     public class Character : RealGameObject
     {
         public new const string Type = "character";
+        [LevelEditorName("Key Press Actions")]
         public List<OnKeyEvent> keyEvents;
 
         public override void Save(dynamic dynamic)
