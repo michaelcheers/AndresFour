@@ -267,19 +267,24 @@ namespace AndresFour
                         value = await GameObject.Create(value);
                     row = new HTMLTableRowElement();
                     row.Indent(indent);
+                    var contentEditable = ContentEditable.True;
                     string valueString;
                     if (value is string)
                         valueString = (string)value;
                     else if (value is double)
                         valueString = ((double)value).ToString();
-                    else if (value is List<GameObject>)
-                        valueString = "List of Objects";
-                    else if (value is List<OnKeyEvent>)
-                        valueString = "List of Key Press Actions";
-                    else if (value is GameObject)
-                        valueString = "Object";
                     else
-                        throw new Exception();
+                    {
+                        contentEditable = ContentEditable.False;
+                        if (value is List<GameObject>)
+                            valueString = "List of Objects";
+                        else if (value is List<OnKeyEvent>)
+                            valueString = "List of Key Press Actions";
+                        else if (value is GameObject)
+                            valueString = "Object";
+                        else
+                            throw new Exception();
+                    }
                     string name = field.Name;
                     var customAttributes = (LevelEditorNameAttribute[])field.GetCustomAttributes(typeof(LevelEditorNameAttribute));
                     if (customAttributes.Length == 1)
@@ -290,7 +295,7 @@ namespace AndresFour
                     };
                     cell2 = new HTMLTableDataCellElement
                     {
-                        ContentEditable = ContentEditable.True,
+                        ContentEditable = contentEditable,
                         InnerHTML = valueString
                     };
                     result.cells.Add(field.Name, cell2);

@@ -487,6 +487,7 @@ Bridge.assembly("AndresFour", function ($asm, globals) {
                         memberType, 
                         customAttributes2, 
                         value, 
+                        contentEditable, 
                         valueString, 
                         name, 
                         customAttributes, 
@@ -633,12 +634,14 @@ Bridge.assembly("AndresFour", function ($asm, globals) {
                                         case 6: {
                                             row = document.createElement('tr');
                                             AndresFour.LevelEditor.Indent(row, indent);
+                                            contentEditable = "true";
                                             if (Bridge.is(value, System.String)) {
                                                 valueString = Bridge.cast(value, System.String);
                                             } else {
                                                 if (Bridge.is(value, System.Double)) {
                                                     valueString = System.Double.format(System.Nullable.getValue(Bridge.cast(Bridge.unbox(value), System.Double)), 'G');
                                                 } else {
+                                                    contentEditable = "false";
                                                     if (Bridge.is(value, System.Collections.Generic.List$1(AndresFour.GameObject))) {
                                                         valueString = "List of Objects";
                                                     } else {
@@ -660,7 +663,7 @@ Bridge.assembly("AndresFour", function ($asm, globals) {
                                                 name = customAttributes[System.Array.index(0, customAttributes)].LevelEditorName;
                                             }
                                             cell = ($t7=document.createElement('td'), $t7.innerHTML = name, $t7);
-                                            cell2 = ($t8=document.createElement('td'), $t8.contentEditable = "true", $t8.innerHTML = valueString, $t8);
+                                            cell2 = ($t8=document.createElement('td'), $t8.contentEditable = contentEditable, $t8.innerHTML = valueString, $t8);
                                             result.cells.add(field.n, cell2);
                                             result.members.add(field.n, field);
                                             row.appendChild(cell);
